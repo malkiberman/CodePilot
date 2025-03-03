@@ -2,6 +2,12 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  const apiUrl = process.env.API_KEY;  // השם המדויק של ה-API שלך ב-Render
+
+fetch(`${apiUrl}/your-endpoint`)
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
   return (
     <div className="App">
       <header className="App-header">
