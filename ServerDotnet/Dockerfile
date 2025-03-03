@@ -15,8 +15,8 @@ WORKDIR /src
 # Copy the solution file and all projects
 COPY ["CodePilot.sln", "./"]
 COPY ["CodePilot.Api/CodePilot.Api.csproj", "CodePilot.Api/"]
-COPY ["Library1/Library1.csproj", "Library1/"]
-COPY ["Library2/Library2.csproj", "Library2/"]
+COPY ["CodePilot.Data/CodePilot.Data.csproj", "CodePilot.Data/"]
+COPY ["CodePilot.Services/CodePilot.Services.csproj", "CodePilot.Services/"]
 
 # Restore the dependencies for all projects in the solution
 RUN dotnet restore "CodePilot.sln"
