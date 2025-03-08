@@ -9,6 +9,5 @@ services:
       context: .
       dockerfile: CodePilot.Api/Dockerfile
     ports:
-      - 5244:5244
       - 80:80
       - 443:443
