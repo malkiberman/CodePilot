@@ -9,8 +9,8 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG configuration=Release
 WORKDIR /src
 COPY ["CodePilot.Api/CodePilot.Api.csproj", "CodePilot.Api/"]
-COPY ["CodePilot.BLL/CodePilot.Services.csproj", "CodePilot.Services/"]
-COPY ["CodePilot.DAL/CodePilot.Data.csproj", "CodePilot.Data/"]
+COPY ["../CodePilot.Services/CodePilot.Services.csproj", "CodePilot.Services/"]
+COPY ["../CodePilot.Data/CodePilot.Data.csproj", "CodePilot.Data/"]
 RUN dotnet restore "CodePilot.Api/CodePilot.Api.csproj"
 COPY . .
 WORKDIR "/src/CodePilot.Api"
