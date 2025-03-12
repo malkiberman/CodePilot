@@ -5,6 +5,7 @@
 
 appsettings.json
 appsettings.Development.json
+ServerDotnet/CodePilot.Api/appsettings.json
 
 # dotenv files
 .env
@@ -485,3 +486,4 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+ServerDotnet/CodePilot.Api/appsettings.json 
