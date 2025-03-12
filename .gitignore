@@ -6,7 +6,7 @@
 appsettings.json
 appsettings.Development.json
 ServerDotnet/CodePilot.Api/appsettings.json
-
+ secrets.json
 # dotenv files
 .env
 

@@ -44,10 +44,7 @@ namespace CodePilot.Api.Controllers
                 Console.WriteLine("⚠️ Missing required fields!");
                 return BadRequest("FileName and LanguageType are required.");
             }
-            foreach (var claim in User.Claims)
-            {
-                Console.WriteLine($"Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-            }
+
             var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
             {
