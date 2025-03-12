@@ -11,6 +11,7 @@ WORKDIR /src
 COPY ["CodePilot.Api/CodePilot.Api.csproj", "CodePilot.Api/"]
 COPY ["../CodePilot.Services/CodePilot.Services.csproj", "CodePilot.Services/"]
 COPY ["../CodePilot.Data/CodePilot.Data.csproj", "CodePilot.Data/"]
+COPY ["../CodePilot.CORE/CodePilot.CORE.csproj", "CodePilot.CORE/"]
 RUN dotnet restore "CodePilot.Api/CodePilot.Api.csproj"
 COPY . .
 WORKDIR "/src/CodePilot.Api"

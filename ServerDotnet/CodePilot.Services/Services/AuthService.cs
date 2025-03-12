@@ -107,7 +107,7 @@ namespace CodePilot.Services.Services
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddHours(5),
                 signingCredentials: creds
             );
 

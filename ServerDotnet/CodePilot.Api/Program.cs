@@ -10,6 +10,7 @@ using CodePilot.CORE.IRepositories;
 using CodePilot.CORE.Repositories;
 using CodePilot.Data.Entites;
 using Microsoft.AspNetCore.Identity;
+using Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,12 +25,6 @@ var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
 // 🛠️ הוספת DbContext
 builder.Services.AddDbContext<CodePilotDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-
-
 
 // 🛠️ הוספת שירותי Authentication + JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,6 +46,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // 🛠️ הוספת Authorization
 builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+});;
+
+
 
 // 🛠️ הוספת Swagger עם תמיכה ב-JWT
 builder.Services.AddSwaggerGen(c =>
@@ -75,8 +80,24 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// 🛠️ הוספת שירותים נוספים עבור CodeFile
+builder.Services.AddScoped<ICodeFileService, CodeFileService>();
+builder.Services.AddScoped<ICodeFileRepository, CodeFileRepository>();
+builder.Services.AddScoped<S3Service>(); // שירות לניהול קבצים ב-S3
+
+// 🛠️ הוספת שירותים עבור Authentication
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+// 🛠️ הוספת Controllers
 builder.Services.AddControllers();
+
+
 var app = builder.Build();
+
+
+
 
 // 🛠️ שימוש ב-Swagger רק בפיתוח
 if (app.Environment.IsDevelopment())
@@ -84,9 +105,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication(); // 🛠️ הפעלת אימות JWT
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();
