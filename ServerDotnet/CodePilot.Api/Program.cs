@@ -92,8 +92,6 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 // 🛠️ הוספת Controllers
 builder.Services.AddControllers();
-builder.Configuration.AddJsonFile("secrets.json", optional: true, reloadOnChange: true);
-builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
 
 var app = builder.Build();

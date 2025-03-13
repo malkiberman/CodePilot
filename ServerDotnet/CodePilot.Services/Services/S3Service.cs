@@ -19,8 +19,8 @@ namespace Service
         public S3Service(IConfiguration configuration, ILogger<S3Service> logger)
         {
             var awsOptions = configuration.GetSection("AWS");
-            var accessKey = awsOptions["AccessKey"];
-            var secretKey = awsOptions["SecretKey"];
+            var accessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY");
+            var secretKey = Environment.GetEnvironmentVariable("AWS_SECRET_KEY");
             var region = awsOptions["Region"];
             _bucketName = awsOptions["BucketName"];
             _logger = logger;
