@@ -1,4 +1,4 @@
-import React, { useState ,FormEvent} from 'react';
+import  { useState ,FormEvent} from 'react';
 import axios from 'axios';
 
 const Register = () => {
