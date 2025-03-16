@@ -73,6 +73,4 @@ export const changePassword = async (userId: number, oldPassword: string, newPas
     throw error;
   }
 };
-export const logout = async (userId: number)=>{
-  
-}
+

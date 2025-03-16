@@ -139,15 +139,15 @@ namespace CodePilot.Api.Controllers
             if (file == null)
                 return NotFound("File not found.");
 
-            // בדיקת האם הקובץ שייך למשתמש
-            if (file.UserId != int.Parse(userId))
-                return Unauthorized("You are not authorized to download this file.");
+            //// בדיקת האם הקובץ שייך למשתמש
+            //if (file.UserId != int.Parse(userId))
+            //    return Unauthorized("You are not authorized to download this file.");
 
             try
             {
                 // קבלת ה-URL החתום מה-S3
-                var presignedUrl = await _s3Service.GetPresignedUrlAsync(file.FileName, userId);
-                return Ok(new { Url = presignedUrl });
+               // var presignedUrl = await _s3Service.GetPresignedUrlAsync(file.FileName, userId);
+                return Ok( file.FilePath);
             }
             catch (Exception ex)
             {

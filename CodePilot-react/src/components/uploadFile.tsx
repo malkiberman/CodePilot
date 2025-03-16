@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, ChangeEvent, DragEvent } from "react";
 import { uploadFile, getUserFiles } from "../services/codeFileService";
-import { Button, Box, Typography, Grid, CircularProgress, Paper, List, ListItem, ListItemText } from "@mui/material";
+import { Button, Box, Typography, CircularProgress,  List, ListItem, ListItemText } from "@mui/material";
 import { CloudUpload as UploadIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
