@@ -13,6 +13,7 @@ namespace CodePilot.CORE.DTOs
         public string FilePath { get; set; }  // מיקום הקובץ בשרת או ב-S3
         public string FileType { get; set; }  // סוג הקובץ (C#, Java, Python, etc.)
         public DateTime UploadedAt { get; set; }  // תאריך העלאת הקובץ
+        public int UserId { get; set; }  // הוסף את UserId
 
     }
 }

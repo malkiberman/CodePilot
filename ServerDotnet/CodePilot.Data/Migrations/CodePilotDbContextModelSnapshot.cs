@@ -171,6 +171,34 @@ namespace CodePilot.Data.Migrations
                     b.ToTable("UserFileAccesses");
                 });
 
+            modelBuilder.Entity("CodePilot.Data.Entities.FileVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CodeFileId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VersionId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodeFileId");
+
+                    b.ToTable("FileVersions");
+                });
+
             modelBuilder.Entity("CodePilot.Data.Entites.AuditLog", b =>
                 {
                     b.HasOne("CodePilot.Data.Entites.User", "User")
@@ -223,9 +251,22 @@ namespace CodePilot.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CodePilot.Data.Entities.FileVersion", b =>
+                {
+                    b.HasOne("CodePilot.Data.Entites.CodeFile", "CodeFile")
+                        .WithMany("FileVersions")
+                        .HasForeignKey("CodeFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CodeFile");
+                });
+
             modelBuilder.Entity("CodePilot.Data.Entites.CodeFile", b =>
                 {
                     b.Navigation("CodeAnalyses");
+
+                    b.Navigation("FileVersions");
                 });
 
             modelBuilder.Entity("CodePilot.Data.Entites.User", b =>

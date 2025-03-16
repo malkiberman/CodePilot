@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodePilot.Data.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,5 +17,6 @@ namespace CodePilot.Data.Entites
         public int UserId { get; set; }  // מזהה המשתמש שצירף את הקובץ
         public User User { get; set; }  // קשר עם המשתמש
         public ICollection<CodeAnalysis> CodeAnalyses { get; set; }
+        public ICollection<FileVersion> FileVersions { get; set; }
     }
 }

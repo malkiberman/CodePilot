@@ -4,11 +4,12 @@ using Amazon.S3.Transfer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Service
+namespace CodePilot.Services
 {
     public class S3Service
     {
@@ -24,13 +25,15 @@ namespace Service
             var region = awsOptions["Region"];
             _bucketName = awsOptions["BucketName"];
             _logger = logger;
-
             _s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.GetBySystemName(region));
         }
 
-        public async Task<string> UploadFileAsync(Stream fileStream, string fileName)
+        // העלאת קובץ (בהתאם לסוג קובץ קוד)
+        public async Task<string> UploadCodeFileAsync(Stream fileStream, string fileName, string userId)
         {
-            // בדיקה אם הקובץ הוא מסוג קוד
+            var key = $"{userId}/{fileName}"; // יצירת מזהה ייחודי לקובץ
+
+            // בדיקה אם הקובץ הוא קובץ קוד
             if (!IsValidCodeFile(fileName))
             {
                 _logger.LogError($"Invalid file type: {fileName}");
@@ -39,46 +42,29 @@ namespace Service
 
             try
             {
+                // העלאת הקובץ ל-S3
                 var request = new PutObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = fileName,
+                    Key = key,
                     InputStream = fileStream,
-                    ContentType = "application/octet-stream" // סוג קובץ גנרי
+                    ContentType = "application/octet-stream"
                 };
 
                 var response = await _s3Client.PutObjectAsync(request);
-                _logger.LogInformation($"File {fileName} uploaded successfully to S3.");
-                return $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{fileName}";
+                _logger.LogInformation($"File {fileName} uploaded successfully for user {userId}. Version: {response.VersionId}");
+
+                // החזרת כתובת URL של הקובץ המועלה
+                return $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{key}";
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error uploading file {fileName}: {ex.Message}");
+                _logger.LogError($"Error uploading file {fileName} for user {userId}: {ex.Message}");
                 throw new Exception($"Error uploading file {fileName}: {ex.Message}", ex);
             }
         }
 
-        public async Task<Stream> DownloadFileAsync(string fileName)
-        {
-            try
-            {
-                var request = new GetObjectRequest
-                {
-                    BucketName = _bucketName,
-                    Key = fileName
-                };
-
-                var response = await _s3Client.GetObjectAsync(request);
-                return response.ResponseStream;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error downloading file {fileName}: {ex.Message}");
-                throw new Exception($"Error downloading file {fileName}: {ex.Message}", ex);
-            }
-        }
-
-        // פונקציה לבדיקת סוג הקובץ
+        // פונקציה לבדיקת סוג קובץ קוד
         private bool IsValidCodeFile(string fileName)
         {
             var allowedExtensions = new[] { ".cs", ".java", ".py", ".js", ".cpp", ".html", ".css" };
@@ -86,21 +72,62 @@ namespace Service
             return allowedExtensions.Contains(fileExtension, StringComparer.OrdinalIgnoreCase);
         }
 
-        // אפשרות לשימוש ב-TransferUtility להעלאה
-        public async Task<string> UploadFileWithTransferUtilityAsync(Stream fileStream, string fileName)
+        // הורדת כל הקבצים של יוזר מסוים
+        public async Task<List<string>> DownloadAllFilesAsync(string userId)
         {
+            var keyPrefix = $"{userId}/";
+            var fileUrls = new List<string>();
+
             try
             {
-                var fileTransferUtility = new TransferUtility(_s3Client);
-                await fileTransferUtility.UploadAsync(fileStream, _bucketName, fileName);
-                _logger.LogInformation($"File {fileName} uploaded using TransferUtility.");
-                return $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{fileName}";
+                var listObjectsRequest = new ListObjectsV2Request
+                {
+                    BucketName = _bucketName,
+                    Prefix = keyPrefix
+                };
+
+                var objectsResponse = await _s3Client.ListObjectsV2Async(listObjectsRequest);
+
+                foreach (var s3Object in objectsResponse.S3Objects)
+                {
+                    var fileUrl = $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{s3Object.Key}";
+                    fileUrls.Add(fileUrl);
+                }
+
+                return fileUrls;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error uploading file {fileName} with TransferUtility: {ex.Message}");
-                throw new Exception($"Error uploading file {fileName} with TransferUtility: {ex.Message}", ex);
+                _logger.LogError($"Error downloading all files for user {userId}: {ex.Message}");
+                throw new Exception($"Error downloading all files for user {userId}: {ex.Message}", ex);
             }
         }
+        // קבלת URL חתום להורדת קובץ
+        public async Task<string> GetPresignedUrlAsync(string fileName, string userId)
+        {
+            var key = $"{userId}/{fileName}"; // המפתח ב-S3 כולל את מזהה המשתמש
+
+            try
+            {
+                // יצירת בקשה ל-URL חתום
+                var request = new GetPreSignedUrlRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key,
+                    Expires = DateTime.UtcNow.AddMinutes(15), // זמן פקיעה ל-15 דקות
+                    Verb = HttpVerb.GET // רק קריאה, לא שינוי
+                };
+
+                // יצירת ה-URL החתום
+                var url = _s3Client.GetPreSignedURL(request);
+                return url;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error generating presigned URL for file {fileName} and user {userId}: {ex.Message}");
+                throw new Exception($"Error generating presigned URL: {ex.Message}", ex);
+            }
+        }
+
     }
 }

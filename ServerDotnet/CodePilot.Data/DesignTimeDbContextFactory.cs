@@ -10,7 +10,7 @@ public class CodePilotDbContextFactory : IDesignTimeDbContextFactory<CodePilotDb
     {
         var optionsBuilder = new DbContextOptionsBuilder<CodePilotDbContext>();
 
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=Mb214833493!;Database=postgres");
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Username=postgres;Password=Mb214833493!;Database=CodePilotDb");
 
         return new CodePilotDbContext(optionsBuilder.Options);
     }

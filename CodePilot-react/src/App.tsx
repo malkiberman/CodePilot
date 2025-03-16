@@ -1,14 +1,20 @@
-import Login from "./components/login";
-import UploadFile from "./components/uploadFile";
+import { BrowserRouter as Router } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
+import CustomToolbar from "./components/Toolbar";
+import { Box, Container } from "@mui/material";
+import { FC } from "react";
 
-function App() {
+const App: FC = () => {
   return (
-    <div>
-      <h1>Welcome to CodePilot</h1>
-      <Login />
-      <UploadFile />
-    </div>
+    <Router>
+      <CustomToolbar />
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 5 }}>
+        <Container maxWidth="md">
+          <AppRoutes />
+        </Container>
+      </Box>
+    </Router>
   );
-}
+};
 
 export default App;

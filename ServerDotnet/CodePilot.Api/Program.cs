@@ -10,7 +10,11 @@ using CodePilot.CORE.IRepositories;
 using CodePilot.CORE.Repositories;
 using CodePilot.Data.Entites;
 using Microsoft.AspNetCore.Identity;
-using Service;
+using CodePilot.Services;
+using Microsoft.Exchange.WebServices.Data;
+using codepilot.core.Repositories.Interfaces;
+using CodePilot.Core.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +88,8 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<ICodeFileService, CodeFileService>();
 builder.Services.AddScoped<ICodeFileRepository, CodeFileRepository>();
 builder.Services.AddScoped<S3Service>(); // שירות לניהול קבצים ב-S3
+builder.Services.AddScoped<IFileVersionService, FileVersionService>();
+builder.Services.AddScoped<IFileVersionRepository, FileVersionRepository>();
 
 // 🛠️ הוספת שירותים עבור Authentication
 builder.Services.AddScoped<IAuthService, AuthService>();

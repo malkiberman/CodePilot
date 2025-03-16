@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CodePilot.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class AddFileVersionsTable3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -97,6 +97,28 @@ namespace CodePilot.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FileVersions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CodeFileId = table.Column<int>(type: "integer", nullable: false),
+                    VersionId = table.Column<int>(type: "integer", nullable: false),
+                    FilePath = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FileVersions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FileVersions_CodeFiles_CodeFileId",
+                        column: x => x.CodeFileId,
+                        principalTable: "CodeFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserFileAccesses",
                 columns: table => new
                 {
@@ -139,6 +161,11 @@ namespace CodePilot.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FileVersions_CodeFileId",
+                table: "FileVersions",
+                column: "CodeFileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserFileAccesses_FileId",
                 table: "UserFileAccesses",
                 column: "FileId");
@@ -157,6 +184,9 @@ namespace CodePilot.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "CodeAnalyses");
+
+            migrationBuilder.DropTable(
+                name: "FileVersions");
 
             migrationBuilder.DropTable(
                 name: "UserFileAccesses");

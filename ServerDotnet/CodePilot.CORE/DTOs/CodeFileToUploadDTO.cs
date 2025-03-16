@@ -11,6 +11,8 @@ namespace CodePilot.CORE.DTOs
     {
         public string FileName { get; set; }
         public string FileType { get; set; }
-        public IFormFile File { get; set; }  // הקובץ עצמו (עם תמיכה בקבצים שהמשתמש מ
+        public IFormFile File { get; set; }  // הקובץ עצמו (עם תמיכה בקבצים שהמשתמש
+        public int UserId { get; set; }  // הוסף את UserId
+
     }
 }

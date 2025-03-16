@@ -4,22 +4,21 @@ using CodePilot.Data.Entites;
 using CodePilot.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Authorization;
-using Service; // אם משתמשים ב-AUTHORIZATION
-
 namespace CodePilot.Services.Services
 {
-   public class CodeFileService : ICodeFileService
+    public class CodeFileService : ICodeFileService
     {
         private readonly ICodeFileRepository _codeFileRepository;
         private readonly ILogger<CodeFileService> _logger;
         private readonly S3Service _s3Service;
         private readonly IUserRepository _userRepository;
+
         public CodeFileService(ICodeFileRepository codeFileRepository, ILogger<CodeFileService> logger, S3Service s3Service, IUserRepository userRepository)
         {
             _codeFileRepository = codeFileRepository;
@@ -32,39 +31,34 @@ namespace CodePilot.Services.Services
         {
             try
             {
-                // בודקים אם סוג הקובץ תקין
                 var isValid = await ValidateFileTypeAsync(codeFileDTO.File);
                 if (!isValid)
                 {
-                    _logger.LogWarning($"Attempt to upload invalid file type: {codeFileDTO.FileType} - {codeFileDTO.FileName}");
-                    return null; // אפשר גם להחזיר BadRequest אם זה API
+                    _logger.LogWarning($"Invalid file type: {codeFileDTO.FileType} - {codeFileDTO.FileName}");
+                    return null;
                 }
 
-                // מחפשים את המשתמש ומוודאים שהוא מחובר
                 var user = await _userRepository.GetUserByIdAsync(userId);
                 if (user == null)
                 {
                     _logger.LogWarning($"User with ID {userId} not found.");
-                    return null; // במקרה של משתמש לא מחובר
+                    return null;
                 }
 
-                // העלאת הקובץ ל-S3
                 using (var stream = codeFileDTO.File.OpenReadStream())
                 {
-                    var filePathInS3 = await _s3Service.UploadFileAsync(stream, codeFileDTO.FileName); // Upload to S3
+                    var filePathInS3 = await _s3Service.UploadCodeFileAsync(stream, codeFileDTO.FileName, user.Username);
 
-                    // מחברים את ה-DTO למחלקת ה-Entity של CodeFile
                     var codeFile = new CodeFile
                     {
                         FileName = codeFileDTO.FileName,
-                        FilePath = filePathInS3, // מיקום הקובץ ב-S3
+                        FilePath = filePathInS3,
                         FileType = codeFileDTO.FileType,
                         UploadedAt = DateTime.UtcNow,
-                        UserId = userId // מגדירים את מזהה המשתמש שנמצא
+                        UserId = userId
                     };
 
                     await _codeFileRepository.AddAsync(codeFile);
-
                     _logger.LogInformation($"Successfully uploaded file: {codeFileDTO.FileName}");
 
                     return codeFileDTO;
@@ -81,9 +75,8 @@ namespace CodePilot.Services.Services
         {
             try
             {
-                var validTypes = new[] { ".cs", ".java", ".py", ".js", ".cpp", ".html", ".css", "ts", "tsx" }; // סוגי קבצים שנחשבים תקינים
-
-                var fileExtension = Path.GetExtension(file.FileName); // בודק את הסיומת לפי שם הקובץ
+                var validTypes = new[] { ".cs", ".java", ".py", ".js", ".cpp", ".html", ".css", "ts", "tsx" };
+                var fileExtension = Path.GetExtension(file.FileName);
                 var isValid = validTypes.Contains(fileExtension);
 
                 if (!isValid)
@@ -123,6 +116,38 @@ namespace CodePilot.Services.Services
             catch (Exception ex)
             {
                 _logger.LogError($"Error while retrieving file with ID {id}: {ex.Message}", ex);
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<CodeFileDTO>> GetFilesByUserIdAsync(int userId)
+        {
+            try
+            {
+                var user = await _userRepository.GetUserByIdAsync(userId);
+                if (user == null)
+                {
+                    _logger.LogWarning($"User with ID {userId} not found.");
+                    return null;
+                }
+
+                var codeFiles = await _codeFileRepository.GetAllAsync();
+                var userCodeFiles = codeFiles.Where(cf => cf.UserId == userId);
+
+                var codeFileDTOs = userCodeFiles.Select(cf => new CodeFileDTO
+                {
+                    Id = cf.Id,
+                    FileName = cf.FileName,
+                    FilePath = cf.FilePath,
+                    FileType = cf.FileType,
+                    UploadedAt = cf.UploadedAt
+                });
+
+                return codeFileDTOs;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while retrieving files for user with ID {userId}: {ex.Message}", ex);
                 throw;
             }
         }

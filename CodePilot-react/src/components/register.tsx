@@ -1,40 +1,141 @@
-import  { useState ,FormEvent} from 'react';
-import axios from 'axios';
+import { useState, FormEvent } from 'react';
+import { Button, TextField, Container, Typography, Box, InputAdornment } from '@mui/material';
+import { Email, Lock, Person, AssignmentInd } from '@mui/icons-material';
+import { registerUser } from '../services/authService';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [role, setRole] = useState('');
+  const [message, setMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      await axios.post('https://localhost:7099/api/auth/register', { email, password });
-      alert('Registration successful');
-    } catch (error) {
-      alert('Registration failed');
+    setIsSubmitting(true);
+    setMessage('');
+
+    if (!email || !password || !username || !role) {
+      setMessage('Please fill in all fields.');
+      setIsSubmitting(false);
+      return;
     }
+
+    try {
+      const data = await registerUser(username, email, password, role);
+      localStorage.setItem("token", data.token); // שומר את ה-JWT
+      setMessage(`Registration successful! Welcome ${data.username}`);
+    } catch (error) {
+      setMessage("Registration failed. Check your credentials.");
+    }
+
+    setIsSubmitting(false);
   };
 
-
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Register</button>
-      </form>
-    </div>
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          marginTop: 8,
+          backgroundColor: 'white',
+          padding: 4,
+          borderRadius: 2,
+          boxShadow: 3,
+        }}
+      >
+        <Typography variant="h5" gutterBottom>
+          Register
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          noValidate
+          sx={{ width: '100%' }}
+        >
+          <TextField
+            label="Username"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Person />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            label="Email"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Email />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            label="Password"
+            type="password"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Lock />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            label="Role"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AssignmentInd />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ marginTop: 2 }}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Registering...' : 'Register'}
+          </Button>
+        </Box>
+
+        {/* הצגת הודעת הצלחה או שגיאה */}
+        {message && (
+          <Typography variant="body1" color={message.includes('successful') ? 'success.main' : 'error.main'} sx={{ marginTop: 2 }}>
+            {message}
+          </Typography>
+        )}
+      </Box>
+    </Container>
   );
 };
 

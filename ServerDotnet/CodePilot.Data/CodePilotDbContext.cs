@@ -1,4 +1,5 @@
 ﻿using CodePilot.Data.Entites;
+using CodePilot.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,7 @@ namespace CodePilot.Data
         public DbSet<CodeFile> CodeFiles { get; set; }
         public DbSet<CodeAnalysis> CodeAnalyses { get; set; }
         public DbSet<UserFileAccess> UserFileAccesses { get; set; }
+        public DbSet<FileVersion> FileVersions { get; set; }        
         public DbSet<AuditLog> AuditLogs { get; set; }
         
         public CodePilotDbContext(DbContextOptions<CodePilotDbContext> options) : base(options) { }
