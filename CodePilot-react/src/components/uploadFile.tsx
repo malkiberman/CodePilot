@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect, ChangeEvent, DragEvent } from "react";
 import { uploadFile, getUserFiles, uploadFileVersion } from "../services/codeFileService";
-import { Button, Box, Typography, CircularProgress,  List, ListItem, ListItemText } from "@mui/material";
+import { Button, Box, Typography, CircularProgress } from "@mui/material";
 import { CloudUpload as UploadIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import FileList from "./FileList";
 const UserFiles = () => {
   const [files, setFiles] = useState<any[]>([]);
@@ -10,7 +9,7 @@ const UserFiles = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const navigate =useNavigate();
+  
   useEffect(() => {
     loadUserFiles();
   }, []);
