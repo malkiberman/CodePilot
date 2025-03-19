@@ -1,8 +1,7 @@
-import  { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../components/login";
 import Register from "../components/register";
-import UploadFile from "../components/uploadFile";
 import UserFiles from "../components/uploadFile";
 import FileViewer from "../components/FileViewer";
 
@@ -10,32 +9,32 @@ const AppRoutes: FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
-    // בדוק אם יש טוקן ב-localStorage או sessionStorage
     const token = sessionStorage.getItem("token");
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    setIsAuthenticated(!!token);
   }, []);
 
   return (
     <Routes>
-      {/* נתיב ללוגין */}
-      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/login" />} />
+      {/* עמוד התחברות */}
+      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/files" />} />
       
-      {/* נתיב להרשמה */}
-      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/register" />} />
+      {/* עמוד הרשמה */}
+      <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/files" />} />
 
-      {/* כל הדפים האחרים מוצגים רק אם המשתמש מחובר */}
-      {isAuthenticated && (
+      {/* דפים שדורשים התחברות */}
+      {isAuthenticated ? (
         <>
-          <Route path="/upload" element={<UploadFile />} />
-          <Route path="/user-files" element={<UserFiles />} />
-          <Route path="/file/:id" element={<FileViewer />} />
+          <Route path="/files" element={<UserFiles />} />
+         
+          <Route path="/files/:fileId" element={<FileViewer />} />
         </>
+      ) : (
+        // אם המשתמש לא מחובר ומנסה להיכנס לעמודים פרטיים → נשלח אותו להתחברות
+        <Route path="*" element={<Navigate to="/login" />} />
       )}
 
-      {/* דף ברירת מחדל אם הנתיב לא נמצא */}
-      <Route path="*" element={<Navigate to={isAuthenticated ? "/upload" : "/login"} />} />
+      {/* אם הנתיב לא קיים, ננווט לפי החיבור */}
+      <Route path="*" element={<Navigate to={isAuthenticated ? "/files" : "/login"} />} />
     </Routes>
   );
 };

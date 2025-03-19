@@ -8,13 +8,13 @@ using CodePilot.Services.IServices;
 using CodePilot.Services.Services;
 using CodePilot.CORE.IRepositories;
 using CodePilot.CORE.Repositories;
-using CodePilot.Data.Entites;
+using CodePilot.Data.Entities;
 using Microsoft.AspNetCore.Identity;
-using CodePilot.Services;
 using Microsoft.Exchange.WebServices.Data;
+using CodePilot.Services;
 using codepilot.core.Repositories.Interfaces;
 using CodePilot.Core.Repositories;
-
+using CodePilot.Data.Entites;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,15 +51,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // 🛠️ הוספת Authorization
 builder.Services.AddAuthorization();
 
+// 🛠️ הגדרת Cors Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
         policy => policy.AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader());
-});;
-
-
+});
 
 // 🛠️ הוספת Swagger עם תמיכה ב-JWT
 builder.Services.AddSwaggerGen(c =>
@@ -87,9 +86,9 @@ builder.Services.AddSwaggerGen(c =>
 // 🛠️ הוספת שירותים נוספים עבור CodeFile
 builder.Services.AddScoped<ICodeFileService, CodeFileService>();
 builder.Services.AddScoped<ICodeFileRepository, CodeFileRepository>();
+builder.Services.AddScoped<IFileVersionRepository, FileVersionRepository>();
 builder.Services.AddScoped<S3Service>(); // שירות לניהול קבצים ב-S3
 builder.Services.AddScoped<IFileVersionService, FileVersionService>();
-builder.Services.AddScoped<IFileVersionRepository, FileVersionRepository>();
 
 // 🛠️ הוספת שירותים עבור Authentication
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -99,11 +98,7 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 // 🛠️ הוספת Controllers
 builder.Services.AddControllers();
 
-
 var app = builder.Build();
-
-
-
 
 // 🛠️ שימוש ב-Swagger רק בפיתוח
 if (app.Environment.IsDevelopment())
@@ -111,6 +106,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication(); // 🛠️ הפעלת אימות JWT

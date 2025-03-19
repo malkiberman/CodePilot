@@ -50,15 +50,15 @@ export const getFileById = async (fileId: number) => {
 };
 
 // פונקציה להחזרת גרסה קודמת של קובץ
-export const revertFileVersion = async (fileId: number, versionId: number) => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/codefile/${fileId}/version`, { versionId });
-    return response.data;
-  } catch (error) {
-    console.error("Failed to revert file version", error);
-    throw error;
-  }
-};
+// export const revertFileVersion = async (fileId: number, versionId: number) => {
+//   try {
+//     const response = await axios.post(`${API_BASE_URL}/codefile/${fileId}/version`, { versionId });
+//     return response.data;
+//   } catch (error) {
+//     console.error("Failed to revert file version", error);
+//     throw error;
+//   }
+// };
 
 // פונקציה לקבלת כל הקבצים של המשתמש
 export const getUserFiles = async () => {
@@ -75,6 +75,46 @@ export const getUserFiles = async () => {
     return response.data;
   } catch (error) {
     console.error("שגיאה בקבלת קבצי משתמש:", error);
+    throw error;
+  }
+};
+
+
+export const getFileVersions = async (fileId: number) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/CodeFile/${fileId}/versions`);
+    console.log(response);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching file versions:', error);
+    throw error;
+  }
+};export const uploadFileVersion = async (fileId: number, file: File, fileName: string, language: string) => {
+  const token = sessionStorage.getItem("token");
+
+  if (!token) {
+    console.error("No token found in sessionStorage");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("File", file);
+  formData.append("FileName", fileName);
+  formData.append("FileType", language);
+
+  try {
+    const response = await axios.post(`${API_BASE_URL}/CodeFile/${fileId}/version`, formData, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    console.log("Version uploaded:", response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error("Failed to upload file version2222222", error.response?.data ?? error);
     throw error;
   }
 };

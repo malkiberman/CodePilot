@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, ChangeEvent, DragEvent } from "react";
-import { uploadFile, getUserFiles } from "../services/codeFileService";
+import { uploadFile, getUserFiles, uploadFileVersion } from "../services/codeFileService";
 import { Button, Box, Typography, CircularProgress,  List, ListItem, ListItemText } from "@mui/material";
 import { CloudUpload as UploadIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-
+import FileList from "./FileList";
 const UserFiles = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -48,19 +48,31 @@ const UserFiles = () => {
       setMessage("Please select a file first.");
       return;
     }
-
+  
     setLoading(true);
     try {
-      const data = await uploadFile(file, file.name, file.type);
-      setMessage(`File uploaded successfully! ID: ${data.fileId}`);
-      loadUserFiles();
+      // בדיקת האם כבר קיים קובץ עם אותו שם
+      const existingFile = files.find(f => f.fileName === file.name);
+      if (existingFile) {
+        // אם הקובץ קיים, מוסיפים אותו כגרסה חדשה
+        await uploadFileVersion(existingFile.id, file,file.name, file.type);
+        setMessage(`File version added successfully!`);
+      } else {
+        // אם הקובץ לא קיים, מעלים אותו כקובץ חדש
+        await uploadFile(file, file.name, file.type);
+        setMessage(`File uploaded successfully!`);
+      }
+      
+      loadUserFiles(); // לרענן את רשימת הקבצים לאחר ההעלאה
     } catch (error) {
+      console.error("Failed to upload file version111111",  error);
       setMessage("File upload failed.");
+    throw error;
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <Box sx={{ maxWidth: 800, margin: "0 auto", padding: 3 }}>
       <Typography variant="h4" gutterBottom align="center">
@@ -109,7 +121,7 @@ const UserFiles = () => {
         Uploaded Files
       </Typography>
 
-      <List>
+      {/* <List>
         {files.map((file) => (
           <ListItem
             key={file.id}
@@ -125,7 +137,8 @@ const UserFiles = () => {
             <ListItemText primary={file.fileName} />
           </ListItem>
         ))}
-      </List>
+      </List>  */}
+      <FileList></FileList>
     </Box>
   );
 };

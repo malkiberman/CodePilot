@@ -14,8 +14,8 @@ namespace CodePilot.CORE.Repositories
     public class CodeFileRepository : ICodeFileRepository
     {
         private readonly CodePilotDbContext _context;
-        private readonly ILogger<CodeFileRepository> _logger;  // הוספת ILogger
 
+        private readonly ILogger<CodeFileRepository> _logger;  // הוספת ILogger
 
         public CodeFileRepository(CodePilotDbContext context, ILogger<CodeFileRepository> logger)
         {
@@ -26,17 +26,37 @@ namespace CodePilot.CORE.Repositories
         public async Task<CodeFile> GetByIdAsync(int id)
         {
             _logger.LogInformation($"Attempting to retrieve CodeFile with ID {id}");
-            var codeFile = await _context.CodeFiles.FindAsync(id);
+
+            // שליפת הקובץ על פי ה-ID
+            var codeFile = await _context.CodeFiles
+                .Include(c => c.FileVersions) // כולל את הגרסאות של הקובץ
+                .FirstOrDefaultAsync(c => c.Id == id); // מחפש את הקובץ לפי ה-ID
+
             if (codeFile == null)
             {
                 _logger.LogWarning($"CodeFile with ID {id} not found.");
+                return null; // מחזיר null אם לא נמצא קובץ
             }
-            else
+
+            // בדיקה אם יש גרסאות לקובץ
+            if (codeFile.FileVersions != null && codeFile.FileVersions.Any())
             {
-                _logger.LogInformation($"Successfully retrieved CodeFile with ID {id}");
+                // מחפש את הגרסה האחרונה (נניח שיש לך תאריך או ID שמאפשר לזהות את הגרסה החדשה ביותר)
+                var latestVersion = codeFile.FileVersions.OrderByDescending(v => v.CreatedAt).FirstOrDefault();
+                //if (latestVersion != null)
+                //{
+                //    _logger.LogInformation($"Successfully retrieved CodeFile with ID {id}, latest version ID {latestVersion.Id}");
+                //    codeFile.CurrentVersion = latestVersion; // מגדיר את הגרסה האחרונה בקובץ (אם צריך)
+                //}
+                //else
+                //{
+                //    _logger.LogWarning($"No versions found for CodeFile with ID {id}");
+                //}
             }
+
             return codeFile;
         }
+
 
         public async Task<IEnumerable<CodeFile>> GetAllAsync()
         {

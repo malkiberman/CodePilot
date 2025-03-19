@@ -1,6 +1,8 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using codepilot.core.Repositories.Interfaces;
+using CodePilot.Core.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -16,8 +18,9 @@ namespace CodePilot.Services
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
         private readonly ILogger<S3Service> _logger;
+        private IFileVersionRepository _fileVersionRepository;
 
-        public S3Service(IConfiguration configuration, ILogger<S3Service> logger)
+        public S3Service(IConfiguration configuration, ILogger<S3Service> logger, IFileVersionRepository fileVersionRepository)
         {
             var awsOptions = configuration.GetSection("AWS");
             var accessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY");
@@ -26,15 +29,16 @@ namespace CodePilot.Services
             _bucketName = awsOptions["BucketName"];
             _logger = logger;
             _s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.GetBySystemName(region));
+            _fileVersionRepository = fileVersionRepository;
         }
 
         // העלאת קובץ (בהתאם לסוג קובץ קוד)
-        public async Task<string> UploadCodeFileAsync(Stream fileStream, string fileName, string userId)
+        public async Task<string> UploadCodeFileAsync(Stream fileStream, string fileName, string userId, bool IsVerison)
         {
             var key = $"{userId}/{fileName}"; // יצירת מזהה ייחודי לקובץ
 
             // בדיקה אם הקובץ הוא קובץ קוד
-            if (!IsValidCodeFile(fileName))
+            if (!IsValidCodeFile(fileName.Substring(0,IsVerison?fileName.Length-1:fileName.Length)))
             {
                 _logger.LogError($"Invalid file type: {fileName}");
                 throw new Exception("Invalid file type. Only code files are allowed.");
@@ -102,6 +106,7 @@ namespace CodePilot.Services
                 throw new Exception($"Error downloading all files for user {userId}: {ex.Message}", ex);
             }
         }
+
         // קבלת URL חתום להורדת קובץ
         public async Task<string> GetPresignedUrlAsync(string fileName, string userId)
         {
@@ -128,6 +133,33 @@ namespace CodePilot.Services
                 throw new Exception($"Error generating presigned URL: {ex.Message}", ex);
             }
         }
+
+
+        public async Task<string> DownloadFileVersionAsync(int fileId, int versionId)
+        {
+            var key = $"{fileId}/{versionId}/fileContent"; // key בנוי ממזהה קובץ וגרסה
+            try
+            {
+                var request = new GetObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key
+                };
+
+                var response = await _s3Client.GetObjectAsync(request);
+                using (var reader = new StreamReader(response.ResponseStream))
+                {
+                    var content = await reader.ReadToEndAsync();
+                    return content;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error downloading file version {versionId} for file {fileId}: {ex.Message}");
+                throw new Exception($"Error downloading file version {versionId}: {ex.Message}", ex);
+            }
+        }
+
 
     }
 }

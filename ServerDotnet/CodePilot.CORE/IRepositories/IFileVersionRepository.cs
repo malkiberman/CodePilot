@@ -21,5 +21,7 @@ namespace codepilot.core.Repositories.Interfaces
 
         // קבלת הגירסה האחרונה של קובץ
         Task<FileVersion> GetLatestVersionAsync(int fileId);
+
+        Task<FileVersion> GetFileVersionByIdAsync(int fileId, int versionId);
     }
 }

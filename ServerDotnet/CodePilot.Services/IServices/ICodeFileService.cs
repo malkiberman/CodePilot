@@ -8,7 +8,7 @@ namespace CodePilot.Services.IServices
     {
         Task<CodeFileToUploadDTO> UploadFileAsync(CodeFileToUploadDTO codeFileDTO, int userId);
         Task<CodeFileDTO> GetFileByIdAsync(int id);
-        Task<bool> ValidateFileTypeAsync(IFormFile file);
+
         Task<IEnumerable<CodeFileDTO>> GetFilesByUserIdAsync(int userId);
     }
 }

@@ -31,12 +31,7 @@ namespace CodePilot.Services.Services
         {
             try
             {
-                var isValid = await ValidateFileTypeAsync(codeFileDTO.File);
-                if (!isValid)
-                {
-                    _logger.LogWarning($"Invalid file type: {codeFileDTO.FileType} - {codeFileDTO.FileName}");
-                    return null;
-                }
+               
 
                 var user = await _userRepository.GetUserByIdAsync(userId);
                 if (user == null)
@@ -47,7 +42,7 @@ namespace CodePilot.Services.Services
 
                 using (var stream = codeFileDTO.File.OpenReadStream())
                 {
-                    var filePathInS3 = await _s3Service.UploadCodeFileAsync(stream, codeFileDTO.FileName, user.Username);
+                    var filePathInS3 = await _s3Service.UploadCodeFileAsync(stream, codeFileDTO.FileName, user.Username,false);
 
                     var codeFile = new CodeFile
                     {
@@ -71,27 +66,7 @@ namespace CodePilot.Services.Services
             }
         }
 
-        public async Task<bool> ValidateFileTypeAsync(IFormFile file)
-        {
-            try
-            {
-                var validTypes = new[] { ".cs", ".java", ".py", ".js", ".cpp", ".html", ".css", "ts", "tsx" };
-                var fileExtension = Path.GetExtension(file.FileName);
-                var isValid = validTypes.Contains(fileExtension);
-
-                if (!isValid)
-                {
-                    _logger.LogWarning($"Invalid file extension detected: {fileExtension}.");
-                }
-
-                return isValid;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error during file type validation: {ex.Message}", ex);
-                throw;
-            }
-        }
+       
 
         public async Task<CodeFileDTO> GetFileByIdAsync(int id)
         {

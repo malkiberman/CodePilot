@@ -13,6 +13,7 @@ namespace CodePilot.Services.IServices
     {
         Task<FileVersionResponseDto> AddFileVersionAsync(int fileId, FileVersionDto fileVersionDto, int userId);
         Task<List<FileVersion>> GetFileVersionsAsync(int fileId);
+        Task<FileVersion> GetFileVersionByIdAsync(int fileId, int versionId);
     }
 
 }
