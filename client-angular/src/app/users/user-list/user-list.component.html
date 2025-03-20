@@ -1,0 +1,38 @@
+
+<h1>רשימת משתמשים</h1>
+
+<div *ngIf="loading">טוען משתמשים...</div>
+<div *ngIf="error" style="color: red;">{{ error }}</div>
+
+<mat-accordion *ngIf="users.length > 0 && !loading && !error">
+  <mat-expansion-panel *ngFor="let user of users">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        {{ user.username }} <span *ngIf="user.email">({{ user.email }})</span>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <mat-list>
+      <mat-list-item *ngIf="user.id">
+        <mat-icon matListItemIcon>fingerprint</mat-icon>
+        <div matListItemTitle>ID</div>
+        <div matListItemLine>{{ user.id }}</div>
+      </mat-list-item>
+      <mat-list-item *ngIf="user.created_at">
+        <mat-icon matListItemIcon>calendar_today</mat-icon>
+        <div matListItemTitle>נוצר בתאריך</div>
+        <div matListItemLine>{{ user.created_at | date }}</div>
+      </mat-list-item>
+    </mat-list>
+
+    <mat-panel-description>
+      <button mat-icon-button color="warn" (click)="deleteUser(user.id!)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </mat-panel-description>
+  </mat-expansion-panel>
+</mat-accordion>
+
+<div *ngIf="users.length === 0 && !loading && !error">
+  אין משתמשים במערכת.
+</div>

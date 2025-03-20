@@ -1,0 +1,33 @@
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <mat-card style="width: 300px;">
+      <mat-card-title style="text-align: center;">התחברות</mat-card-title>
+      <mat-card-content>
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline" style="width: 100%;">
+            <mat-label>שם משתמש</mat-label>
+            <input matInput formControlName="email" required>
+            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+              שם משתמש הוא חובה.
+            </mat-error>
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" style="width: 100%; margin-top: 16px;">
+            <mat-label>סיסמה</mat-label>
+            <input matInput type="password" formControlName="password" required>
+            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+              סיסמה היא חובה.
+            </mat-error>
+          </mat-form-field>
+  
+          <div style="margin-top: 24px; text-align: center;">
+            <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+              {{ loading ? 'מתחבר...' : 'התחבר' }}
+            </button>
+            <div *ngIf="loginError" style="color: red; margin-top: 10px;">
+              {{ loginError }}
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
