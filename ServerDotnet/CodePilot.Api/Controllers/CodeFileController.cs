@@ -31,6 +31,7 @@ namespace CodePilot.Api.Controllers
         }
 
         // 📌 העלאת קובץ חדש
+        // 📌 העלאת קובץ חדש עם ניהול גרסאות מובנה ב-S3
         [HttpPost("upload")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UploadFile([FromForm] CodeFileToUploadDTO codeFileDTO)
@@ -41,14 +42,11 @@ namespace CodePilot.Api.Controllers
                 return BadRequest("FileName and LanguageType are required.");
 
             var userId = User.Claims
-      .Where(c => c.Type == ClaimTypes.NameIdentifier)
-      .Select(c => c.Value)
-      .FirstOrDefault(v => int.TryParse(v, out _));
+                .Where(c => c.Type == ClaimTypes.NameIdentifier)
+                .Select(c => c.Value)
+                .FirstOrDefault(v => int.TryParse(v, out _));
             if (string.IsNullOrEmpty(userId))
-            {
-                Console.WriteLine("⚠️ User is not authenticated!");
                 return Unauthorized("User is not authenticated.");
-            }
 
             try
             {
@@ -61,6 +59,46 @@ namespace CodePilot.Api.Controllers
             }
         }
 
+        // 📌 הוספת גרסה חדשה לקובץ
+        [HttpPost("{fileId}/version")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> AddFileVersion(int fileId, [FromForm] IFormFile file)
+        {
+            if (file == null)
+                return BadRequest("No file uploaded.");
+
+            var userId = User.Claims
+                .Where(c => c.Type == ClaimTypes.NameIdentifier)
+                .Select(c => c.Value)
+                .FirstOrDefault(v => int.TryParse(v, out _));
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User is not authenticated.");
+
+            try
+            {
+                var fileData = await _codeFileService.GetFileByIdAsync(fileId);
+                if (fileData == null)
+                    return NotFound("File not found.");
+
+                using var stream = file.OpenReadStream();
+                string s3Path = await _s3Service.UploadCodeFileAsync(stream, fileData.FileName, userId);
+
+                var fileVersionDto = new FileVersionDto
+                {
+                    FileId = fileId,
+                    CreatedAt = DateTime.UtcNow,
+                    S3Path = s3Path  // הוספת הנתיב ל-S3
+                };
+
+                var result = await _fileVersionService.AddFileVersionAsync(fileId, fileVersionDto, int.Parse(userId));
+                return result != null ? Ok(result) : BadRequest("Failed to add file version.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error uploading file version: {ex.Message}");
+            }
+        }
+
         // 📌 קבלת קובץ לפי מזהה
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFileById(int id)
@@ -70,6 +108,7 @@ namespace CodePilot.Api.Controllers
                 return NotFound("File not found.");
             return Ok(file);
         }
+
 
         // 📌 שליפת כל הקבצים של משתמש מסוים
         [HttpGet("user")]
@@ -92,58 +131,6 @@ namespace CodePilot.Api.Controllers
             if (files == null || !files.Any())
                 return NotFound("No files found for this user.");
             return Ok(files);
-        }
-
-        [HttpPost("{fileId}/version")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> AddFileVersion(int fileId, [FromForm] IFormFile file, [FromForm] string fileName)
-        {
-            if (file == null)
-            {
-                return BadRequest("No file uploaded.");
-            }
-
-            // קבלת מזהה המשתמש מתוך הטוקן
-            var userId = User.Claims
-                .Where(c => c.Type == ClaimTypes.NameIdentifier)
-                .Select(c => c.Value)
-                .FirstOrDefault(v => int.TryParse(v, out _));
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User is not authenticated.");
-            }
-
-            try
-            {
-                // יצירת סטרים מהקובץ לצורך העלאה
-                using (var stream = file.OpenReadStream())
-                {
-
-                    // חישוב מספר גרסה חדש
-                    var versions = await _fileVersionService.GetFileVersionsAsync(fileId);
-                    var versionNumber = versions.Any() ? versions.Max(v => v.VersionId) : 0; ;  // גרסה + 1 או 1 אם אין גרסאות
-
-                    // שליחת הקובץ ל-S3 ושמירת הנתיב
-                    string s3Path = await _s3Service.UploadCodeFileAsync(stream, fileName + versionNumber, userId,true);
-                    // יצירת DTO לגרסה חדשה
-                    var fileVersionDto = new FileVersionDto
-                    {
-                        FileId = fileId,
-                        VersionNumber = versionNumber,  // הגרסה החדשה
-                        CreatedAt = DateTime.UtcNow,
-                        S3Path = s3Path  // הוספת הנתיב ל-S3
-                    };
-
-                    // הוספת גרסה חדשה למסד נתונים או כל פעולה אחרת שתצטרך לבצע
-                    var result = await _fileVersionService.AddFileVersionAsync(fileId, fileVersionDto, int.Parse(userId));
-
-                    return result != null ? Ok(result) : BadRequest("Failed to add file version.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error uploading file version: {ex.Message}");
-            }
         }
 
 
@@ -222,8 +209,76 @@ namespace CodePilot.Api.Controllers
                 return StatusCode(500, $"Error comparing file versions: {ex.Message}");
             }
         }
+        [HttpDelete("{fileId}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> DeleteFile(int fileId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            try
+            {
+                var file = await _codeFileService.GetFileByIdAsync(fileId);
+                if (file == null)
+                    return NotFound("File not found.");
+
+                // מחיקת קובץ וגרסאותיו מה-S3
+                var s3DeleteResult = await _s3Service.DeleteFileWithVersionsAsync(userId, file.FileName);
+                if (!s3DeleteResult)
+                    return BadRequest("Failed to delete file from S3.");
+
+                // מחיקת הקובץ מה-DB
+                await _codeFileService.DeleteCodeFileAsync(fileId);
+
+                return Ok("File and versions deleted successfully.");
+            }
+            catch
+            {
+                return StatusCode(500, "Error deleting file.");
+            }
+        }
+
+        // 📌 עדכון שם קובץ
+        [HttpPut("{fileId}/rename")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> RenameFile(int fileId, [FromBody] RenameFileDto renameFileDto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+
+            try
+            {
+                var file = await _codeFileService.GetFileByIdAsync(fileId);
+                if (file == null)
+                    return NotFound("File not found.");
+
+                // שינוי שם הקובץ ב-S3
+                var s3RenameResult = await _s3Service.RenameFileAsync(userId, file.FileName, renameFileDto.NewFileName);
+                if (!s3RenameResult)
+                    return BadRequest("Failed to rename file in S3.");
+
+                // שינוי שם הקובץ במסד הנתונים
+                file.FileName = renameFileDto.NewFileName;
+                await _codeFileService.UpdateCodeFileAsync(file);
+
+                return Ok("File renamed successfully.");
+            }
+            catch
+            {
+                return StatusCode(500, "Error renaming file.");
+            }
+        }
     }
 
-
 }
+
+
+

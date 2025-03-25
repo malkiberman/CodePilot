@@ -1,16 +1,20 @@
-import { useState, FormEvent } from 'react';
-import { Button, TextField, Container, Typography, Box, InputAdornment } from '@mui/material';
-import { loginUser } from '../services/authService';
-import { Email, Lock, HelpOutline } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useState, FormEvent } from "react";
+import { Button, TextField, Container, Typography, Box, InputAdornment, Paper } from "@mui/material";
+import { Email, Lock, HelpOutline } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/authService";
 
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+interface LoginProps {
+  setIsAuthenticated: (auth: boolean) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const validateForm = () => {
     setEmailError(false);
@@ -30,114 +34,77 @@ const Login = () => {
     return valid;
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     try {
       const data = await loginUser(email, password);
-      sessionStorage.setItem("token", data.data); // שומר את ה-JWT ב-sessionStorage
+      sessionStorage.setItem("token", data);
+      setIsAuthenticated(true);
       setMessage(`Login successful! Welcome ${data.username}`);
-      navigate("/upload");
+
+      setTimeout(() => navigate("/files"), 100);
     } catch (error) {
       setMessage("Login failed. Check your credentials.");
     }
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          marginTop: 8,
-          backgroundColor: 'white',
-          padding: 4,
-          borderRadius: 2,
-          boxShadow: 3,
-        }}
-      >
-        <Typography variant="h5" gutterBottom>
-          Login
-        </Typography>
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          noValidate
-          sx={{ width: '100%' }}
-        >
-          <TextField
-            label="Email"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={emailError}
-            helperText={emailError ? "Please enter a valid email" : ""}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Email />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TextField
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            error={passwordError}
-            helperText={passwordError ? "Password must be at least 6 characters" : ""}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Lock />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{
-              marginTop: 2,
-              transition: 'background-color 0.3s ease',
-              '&:hover': {
-                backgroundColor: '#3f51b5',
-              },
-            }}
-          >
+    <Container maxWidth="xs">
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <Paper elevation={3} sx={{ padding: 4, width: "100%", textAlign: "center" }}>
+          <Typography variant="h4" gutterBottom>
             Login
-          </Button>
-        </Box>
-
-        {message && (
-          <Typography
-            variant="body1"
-            color={message.includes("successful") ? "green" : "red"}
-            sx={{
-              marginTop: 2,
-              animation: 'fadeIn 1s ease-in-out',
-            }}
-          >
-            {message}
           </Typography>
-        )}
-
-        <Button
-          onClick={() => setMessage("Redirecting to password recovery...")}
-          sx={{ marginTop: 2, textTransform: 'none' }}
-        >
-          <HelpOutline sx={{ marginRight: 1 }} />
-          Forgot Password?
-        </Button>
+          {message && (
+            <Typography color={message.includes("successful") ? "success.main" : "error.main"} sx={{ mb: 2 }}>
+              {message}
+            </Typography>
+          )}
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Email"
+              margin="normal"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={emailError}
+              helperText={emailError ? "Please enter a valid email" : ""}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              fullWidth
+              label="Password"
+              type="password"
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              error={passwordError}
+              helperText={passwordError ? "Password must be at least 6 characters" : ""}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+              Login
+            </Button>
+          </form>
+          <Button onClick={() => setMessage("Redirecting to password recovery...")} sx={{ mt: 2, textTransform: "none" }}>
+            <HelpOutline sx={{ mr: 1 }} />
+            Forgot Password?
+          </Button>
+        </Paper>
       </Box>
     </Container>
   );

@@ -3,6 +3,7 @@ import { uploadFile, getUserFiles, uploadFileVersion } from "../services/codeFil
 import { Button, Box, Typography, CircularProgress } from "@mui/material";
 import { CloudUpload as UploadIcon } from "@mui/icons-material";
 import FileList from "./FileList";
+
 const UserFiles = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -64,14 +65,13 @@ const UserFiles = () => {
       
       loadUserFiles(); // לרענן את רשימת הקבצים לאחר ההעלאה
     } catch (error) {
-      console.error("Failed to upload file version111111",  error);
+      console.error("Failed to upload file version", error);
       setMessage("File upload failed.");
-    throw error;
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <Box sx={{ maxWidth: 800, margin: "0 auto", padding: 3 }}>
       <Typography variant="h4" gutterBottom align="center">
@@ -120,24 +120,7 @@ const UserFiles = () => {
         Uploaded Files
       </Typography>
 
-      {/* <List>
-        {files.map((file) => (
-          <ListItem
-            key={file.id}
-            sx={{
-              backgroundColor: "#f5f5f5",
-              borderRadius: "8px",
-              marginBottom: 1,
-              cursor: "pointer",
-              "&:hover": { backgroundColor: "#e0e0e0" },
-            }}
-            onClick={() => navigate(`/file/${file.id}`)}
-          >
-            <ListItemText primary={file.fileName} />
-          </ListItem>
-        ))}
-      </List>  */}
-      <FileList></FileList>
+      <FileList files={files} setFiles={setFiles} />
     </Box>
   );
 };

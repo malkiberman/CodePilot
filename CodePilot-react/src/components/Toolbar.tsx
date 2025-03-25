@@ -1,19 +1,16 @@
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
-import { FC, useState, useEffect } from "react";
+import { FC } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-const CustomToolbar: FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+interface ToolbarProps {
+  isAuthenticated: boolean;
+  setIsAuthenticated: (auth: boolean) => void;
+}
+
+const CustomToolbar: FC<ToolbarProps> = ({ isAuthenticated, setIsAuthenticated }) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // בדוק אם יש טוקן ב-localStorage או sessionStorage
-    const token = sessionStorage.getItem("token");
-    setIsAuthenticated(!!token);
-  }, []);
-
   const handleLogout = () => {
-    // נקה את הטוקן מה-localStorage או sessionStorage
     sessionStorage.removeItem("token");
     setIsAuthenticated(false);
     navigate("/login");
@@ -28,8 +25,8 @@ const CustomToolbar: FC = () => {
 
         {isAuthenticated ? (
           <>
-            <Button color="inherit" component={Link} to="/upload">
-              Upload
+            <Button color="inherit" component={Link} to="/files">
+              Files
             </Button>
             <Button color="inherit" onClick={handleLogout}>
               Logout

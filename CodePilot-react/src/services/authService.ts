@@ -29,27 +29,18 @@ export const loginUser = async (email: string, password: string) => {
       password
     });
     console.log(response.data);
-    console.log(response.data.data);
+   
     const token = response.data.data;
     console.log("Extracted token:", token);
     
     if (!token) {
         console.error("Token is undefined or null!");
     } else {
-        localStorage.setItem("token", String(token));
-        console.log("Stored token:", localStorage.getItem("token"));
-        sessionStorage.setItem("token", token);
-        console.log(sessionStorage.getItem("token"));
-        
-        setTimeout(() => {
-            console.log("Rechecking token:", localStorage.getItem("token"));
-           console.log(   sessionStorage.setItem("token", token));
-console.log(sessionStorage.getItem("token"));
-
-        }, 1000);
+      sessionStorage.setItem("token", String(token));
+        console.log("Stored token:", sessionStorage.getItem("token"));
     }
     
-    return response.data; // מחזיר את ה-token כנראה
+    return response.data.data; // מחזיר את ה-token כנראה
   } catch (error) {
     console.error("Login failed", error);
     throw error;

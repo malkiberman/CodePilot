@@ -1,4 +1,5 @@
-﻿using CodePilot.CORE.IRepositories;
+﻿using CodePilot.CORE.DTOs;
+using CodePilot.CORE.IRepositories;
 using CodePilot.Data;
 using CodePilot.Data.Entites;
 using Microsoft.EntityFrameworkCore;
@@ -82,21 +83,7 @@ namespace CodePilot.CORE.Repositories
             }
         }
 
-        public async Task UpdateAsync(CodeFile codeFile)
-        {
-            try
-            {
-                _logger.LogInformation($"Attempting to update CodeFile with ID: {codeFile.Id}");
-                _context.CodeFiles.Update(codeFile);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation($"Successfully updated CodeFile with ID: {codeFile.Id}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"An error occurred while updating CodeFile with ID: {codeFile.Id}. Error: {ex.Message}");
-                throw;
-            }
-        }
+ 
 
         public async Task DeleteAsync(int id)
         {
@@ -106,9 +93,19 @@ namespace CodePilot.CORE.Repositories
                 var codeFile = await GetByIdAsync(id);
                 if (codeFile != null)
                 {
+                    // מחיקת כל הגרסאות של הקובץ לפני מחיקת הקובץ עצמו
+                    var fileVersions = await _context.FileVersions
+                        .Where(fv => fv.CodeFileId == id)
+                        .ToListAsync();
+
+                    foreach (var version in fileVersions)
+                    {
+                        _context.FileVersions.Remove(version);
+                    }
+
                     _context.CodeFiles.Remove(codeFile);
                     await _context.SaveChangesAsync();
-                    _logger.LogInformation($"Successfully deleted CodeFile with ID {id}");
+                    _logger.LogInformation($"Successfully deleted CodeFile with ID {id} and its versions.");
                 }
                 else
                 {
@@ -121,5 +118,36 @@ namespace CodePilot.CORE.Repositories
                 throw;
             }
         }
+
+        public async Task UpdateAsync(CodeFileDTO codeFile)
+        {
+            try
+            {
+                var entity = await _context.CodeFiles.FindAsync(codeFile.Id);
+
+                _logger.LogInformation($"Attempting to update CodeFile with ID: {codeFile.Id}");
+
+                entity.FileName = codeFile.FileName;
+                await _context.SaveChangesAsync(); // ✔️ רק משנה את האובייקט הקיים
+                // עדכון שם הקובץ בכל הגרסאות גם
+                var fileVersions = await _context.FileVersions
+                                                 .Where(fv => fv.CodeFileId == codeFile.Id)
+                                                 .ToListAsync();
+
+                foreach (var version in fileVersions)
+                {
+                    version.CodeFileId = codeFile.Id; // עדכון שם הקובץ בגרסאות
+                }
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation($"Successfully updated CodeFile with ID: {codeFile.Id} and its versions.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while updating CodeFile with ID: {codeFile.Id}. Error: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

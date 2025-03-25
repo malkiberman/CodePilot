@@ -33,12 +33,12 @@ namespace CodePilot.Services
         }
 
         // העלאת קובץ (בהתאם לסוג קובץ קוד)
-        public async Task<string> UploadCodeFileAsync(Stream fileStream, string fileName, string userId, bool IsVerison)
+        public async Task<string> UploadCodeFileAsync(Stream fileStream, string fileName, string userId)
         {
             var key = $"{userId}/{fileName}"; // יצירת מזהה ייחודי לקובץ
 
             // בדיקה אם הקובץ הוא קובץ קוד
-            if (!IsValidCodeFile(fileName.Substring(0,IsVerison?fileName.Length-1:fileName.Length)))
+            if (!IsValidCodeFile(fileName))
             {
                 _logger.LogError($"Invalid file type: {fileName}");
                 throw new Exception("Invalid file type. Only code files are allowed.");
@@ -68,13 +68,8 @@ namespace CodePilot.Services
             }
         }
 
-        // פונקציה לבדיקת סוג קובץ קוד
-        private bool IsValidCodeFile(string fileName)
-        {
-            var allowedExtensions = new[] { ".cs", ".java", ".py", ".js", ".cpp", ".html", ".css" };
-            var fileExtension = Path.GetExtension(fileName);
-            return allowedExtensions.Contains(fileExtension, StringComparer.OrdinalIgnoreCase);
-        }
+  
+     
 
         // הורדת כל הקבצים של יוזר מסוים
         public async Task<List<string>> DownloadAllFilesAsync(string userId)
@@ -159,7 +154,90 @@ namespace CodePilot.Services
                 throw new Exception($"Error downloading file version {versionId}: {ex.Message}", ex);
             }
         }
+        public async Task<bool> DeleteFileWithVersionsAsync(string userId, string fileName)
+        {
+            var key = $"{userId}/{fileName}";  // מפתח הקובץ ב-S3
 
+            try
+            {
+                // שלב 1: קבלת כל הגרסאות של הקובץ
+                var listVersionsRequest = new ListVersionsRequest
+                {
+                    BucketName = _bucketName,
+                    Prefix = key
+                };
+
+                var listVersionsResponse = await _s3Client.ListVersionsAsync(listVersionsRequest);
+
+                if (listVersionsResponse.Versions!=null&& listVersionsResponse.Versions.Count== 0)
+                {
+                    _logger.LogWarning($"No versions found for file {fileName} (User: {userId}).");
+                    return false;
+                }
+
+                // שלב 2: מחיקת כל הגרסאות
+                foreach (var version in listVersionsResponse.Versions)
+                {
+                    var deleteRequest = new DeleteObjectRequest
+                    {
+                        BucketName = _bucketName,
+                        Key = key,
+                        VersionId = version.VersionId  // מחיקת גרסה ספציפית
+                    };
+
+                    await _s3Client.DeleteObjectAsync(deleteRequest);
+                    _logger.LogInformation($"Deleted version {version.VersionId} of file {fileName} (User: {userId}).");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error deleting file {fileName} and its versions for user {userId}: {ex.Message}");
+                return false;
+            }
+        }
+        public async Task<bool> RenameFileAsync(string userId, string oldFileName, string newFileName)
+        {
+            var oldKey = $"{userId}/{oldFileName}";  // מפתח הקובץ הישן
+            var newKey = $"{userId}/{newFileName}";  // מפתח הקובץ החדש
+
+            try
+            {
+                // שלב 1: להעתיק את הקובץ לשם החדש
+                var copyRequest = new CopyObjectRequest
+                {
+                    SourceBucket = _bucketName,
+                    SourceKey = oldKey,
+                    DestinationBucket = _bucketName,
+                    DestinationKey = newKey
+                };
+
+                var copyResponse = await _s3Client.CopyObjectAsync(copyRequest);
+                if (copyResponse.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    _logger.LogError($"Error renaming file: failed to copy {oldFileName} to {newFileName}");
+                    return false;
+                }
+
+                // שלב 2: למחוק את הקובץ הישן
+                var isDeleted = await DeleteFileWithVersionsAsync(userId, oldFileName);
+                return isDeleted;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error renaming file {oldFileName} to {newFileName} for user {userId}: {ex.Message}");
+                return false;
+            }
+        }
+
+        // פונקציה לבדיקת סוג קובץ קוד
+        private bool IsValidCodeFile(string fileName)
+        {
+            var allowedExtensions = new[] { ".cs", ".java", ".py", ".js", ".cpp", ".html", ".css" };
+            var fileExtension = Path.GetExtension(fileName);
+            return allowedExtensions.Contains(fileExtension, StringComparer.OrdinalIgnoreCase);
+        }
 
     }
 }

@@ -10,17 +10,16 @@ import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { User } from '../user.model';
 @Component({
-  selector: 'app-user-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatExpansionModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-  ],
-  templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.scss'], // אם יש לך קובץ סגנונות
+    selector: 'app-user-list',
+    imports: [
+        CommonModule,
+        MatExpansionModule,
+        MatListModule,
+        MatIconModule,
+        MatButtonModule,
+    ],
+    templateUrl: './user-list.component.html',
+    styleUrls: ['./user-list.component.scss']
 })
 
 export class UserListComponent implements OnInit {

@@ -42,7 +42,7 @@ namespace CodePilot.Services.Services
 
                 using (var stream = codeFileDTO.File.OpenReadStream())
                 {
-                    var filePathInS3 = await _s3Service.UploadCodeFileAsync(stream, codeFileDTO.FileName, user.Username,false);
+                    var filePathInS3 = await _s3Service.UploadCodeFileAsync(stream, codeFileDTO.FileName, user.Username);
 
                     var codeFile = new CodeFile
                     {
@@ -123,6 +123,36 @@ namespace CodePilot.Services.Services
             catch (Exception ex)
             {
                 _logger.LogError($"Error while retrieving files for user with ID {userId}: {ex.Message}", ex);
+                throw;
+            }
+        }
+        public async Task DeleteCodeFileAsync(int id)
+    {
+        try
+        {
+            _logger.LogInformation($"Attempting to delete CodeFile and its versions with ID {id}");
+            await _codeFileRepository.DeleteAsync(id);
+            _logger.LogInformation($"Successfully deleted CodeFile and its versions with ID {id}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error occurred while deleting CodeFile with ID {id}: {ex.Message}");
+            throw;
+        }
+    }
+
+        // עדכון שם קובץ
+        public async Task UpdateCodeFileAsync(CodeFileDTO codeFile)
+        {
+            try
+            {
+                _logger.LogInformation($"Attempting to update CodeFile with ID {codeFile.Id}");
+                await _codeFileRepository.UpdateAsync(codeFile);
+                _logger.LogInformation($"Successfully updated CodeFile with ID {codeFile.Id}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occurred while updating CodeFile with ID {codeFile.Id}: {ex.Message}");
                 throw;
             }
         }

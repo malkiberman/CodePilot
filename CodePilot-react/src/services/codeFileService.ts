@@ -118,3 +118,52 @@ export const getFileVersions = async (fileId: number) => {
     throw error;
   }
 };
+// פונקציה למחיקת קובץ
+export const deleteFile = async (fileId: number) => {
+  const token = sessionStorage.getItem("token");
+
+  if (!token) {
+    console.error("No token found in sessionStorage");
+    return;
+  }
+
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/CodeFile/${fileId}`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    console.log("File deleted:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete file:", error);
+    throw error;
+  }
+};
+
+// פונקציה לשינוי שם קובץ
+export const renameFile = async (fileId: number, newFileName: string) => {
+  const token = sessionStorage.getItem("token");
+
+  if (!token) {
+    console.error("No token found in sessionStorage");
+    return;
+  }
+
+  const renameFileDto = { NewFileName: newFileName };
+
+  try {
+    const response = await axios.put(`${API_BASE_URL}/CodeFile/${fileId}/rename`, renameFileDto, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    console.log("File renamed:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to rename file:", error);
+    throw error;
+  }
+};

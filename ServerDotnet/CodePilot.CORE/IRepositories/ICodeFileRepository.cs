@@ -1,4 +1,5 @@
-﻿using CodePilot.Data.Entites;
+﻿using CodePilot.CORE.DTOs;
+using CodePilot.Data.Entites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace CodePilot.CORE.IRepositories
         Task<CodeFile> GetByIdAsync(int id);
         Task<IEnumerable<CodeFile>> GetAllAsync();
         Task AddAsync(CodeFile codeFile);
-        Task UpdateAsync(CodeFile codeFile);
         Task DeleteAsync(int id);
+        Task UpdateAsync(CodeFileDTO codeFile);
     }
 }
