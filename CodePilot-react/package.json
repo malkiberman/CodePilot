@@ -26,6 +26,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "diff": "^7.0.0",
+    "dotenv": "^16.4.7",
     "framer-motion": "^12.5.0",
     "lucide-react": "^0.483.0",
     "react": "^19.0.0",
