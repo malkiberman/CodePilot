@@ -71,7 +71,7 @@ const FileViewer: React.FC = () => {
                 console.log("useEffect/fetchData: תגובה מ-getFileVersions:", versionsResponse);
 
                 console.log("useEffect/fetchData: קורא ל-fetchFileContent עם הנתיב:", fileResponse?.filePath);
-                const initialContent = await fetchFileContent(fileResponse.filePath);
+                const initialContent = await fetchFileContent(fileResponse);
 
                
                 const versions = versionsResponse?.map((version: any) => {
