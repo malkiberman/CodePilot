@@ -1,5 +1,3 @@
-const API_BASE_URL = import.meta.env.API_BASE_URL
-//  ||"https://localhost:7099/api"
- ; // כאן שימי את הכתובת של ה-API שלך
+const API_BASE_URL = "https://codepilot-6qnc.onrender.com/api";
 
 export default API_BASE_URL;
