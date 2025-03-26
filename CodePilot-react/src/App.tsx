@@ -3,6 +3,7 @@ import AppRoutes from "./routes/AppRoutes";
 import CustomToolbar from "./components/Toolbar";
 import { Box, Container } from "@mui/material";
 import { FC, useEffect, useState } from "react";
+import dotenv from 'dotenv';
 
 const App: FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);

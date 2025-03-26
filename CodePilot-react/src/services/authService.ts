@@ -1,10 +1,10 @@
 // src/services/authService.ts
 import axios from "axios";
-import API_BASE_URL from "../config";
+// import API_BASE_URL from "../config";
 
 export const registerUser = async (username: string, email: string, password: string, role?: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/register`, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/register`, {
       username,
       email,
       password,
@@ -24,7 +24,7 @@ export const registerUser = async (username: string, email: string, password: st
 
 export const loginUser = async (email: string, password: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
       email,
       password
     });
@@ -49,7 +49,7 @@ export const loginUser = async (email: string, password: string) => {
 
 export const changePassword = async (userId: number, oldPassword: string, newPassword: string, token: string) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/change-password`, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/change-password`, {
       userId,
       oldPassword,
       newPassword

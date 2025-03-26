@@ -1,5 +1,5 @@
 import axios from "axios";
-import API_BASE_URL from "../config";
+// import API_BASE_URL from "../config";
 
 // פונקציה להעלאת קובץ
 export const uploadFile = async (file: File, fileName: string, language: string) => {
@@ -16,7 +16,7 @@ export const uploadFile = async (file: File, fileName: string, language: string)
   formData.append("FileType", language);  // שדה "LanguageType" הוסב ל-"FileType"
 
   try {
-    const response = await axios.post(`${API_BASE_URL}/CodeFile/upload`, formData, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/CodeFile/upload`, formData, {
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -35,7 +35,7 @@ export const uploadFile = async (file: File, fileName: string, language: string)
 export const getFileById = async (fileId: number) => {
   const token = sessionStorage.getItem("token");
   try {
-    const response = await axios.get(`${API_BASE_URL}/codefile/${fileId}/download`,{
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/codefile/${fileId}/download`,{
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -67,7 +67,7 @@ export const getUserFiles = async () => {
     if (!token) {
       throw new Error("טוקן לא נמצא");
     }
-    const response = await axios.get(`${API_BASE_URL}/CodeFile/user`, {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/CodeFile/user`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -82,7 +82,7 @@ export const getUserFiles = async () => {
 
 export const getFileVersions = async (fileId: number) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/CodeFile/${fileId}/versions`);
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/CodeFile/${fileId}/versions`);
     console.log(response);
     console.log(response.data);
     return response.data;
@@ -104,7 +104,7 @@ export const getFileVersions = async (fileId: number) => {
   formData.append("FileType", language);
 
   try {
-    const response = await axios.post(`${API_BASE_URL}/CodeFile/${fileId}/version`, formData, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/CodeFile/${fileId}/version`, formData, {
       headers: {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -128,7 +128,7 @@ export const deleteFile = async (fileId: number) => {
   }
 
   try {
-    const response = await axios.delete(`${API_BASE_URL}/CodeFile/${fileId}`, {
+    const response = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/CodeFile/${fileId}`, {
       headers: {
         "Authorization": `Bearer ${token}`,
       },
@@ -154,7 +154,7 @@ export const renameFile = async (fileId: number, newFileName: string) => {
   const renameFileDto = { NewFileName: newFileName };
 
   try {
-    const response = await axios.put(`${API_BASE_URL}/CodeFile/${fileId}/rename`, renameFileDto, {
+    const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/CodeFile/${fileId}/rename`, renameFileDto, {
       headers: {
         "Authorization": `Bearer ${token}`,
       },
