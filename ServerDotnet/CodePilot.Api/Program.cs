@@ -100,6 +100,13 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CodePilotDbContext>();
+    dbContext.Database.Migrate();
+}
+
+
 // 🛠️ שימוש ב-Swagger רק בפיתוח
 if (app.Environment.IsDevelopment())
 {
