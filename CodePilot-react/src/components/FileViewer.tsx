@@ -59,7 +59,7 @@ const FileViewer: React.FC = () => {
             setLoading(true);
             try {
                 const numericFileId = parseInt(fileId, 10);
-                console.log("useEffect/fetchData: fileId כערך מספרי:", numericFileId);
+               
                 if (isNaN(numericFileId)) {
                     console.error("useEffect/fetchData: fileId אינו מספר תקין.");
                     return;
@@ -71,7 +71,7 @@ const FileViewer: React.FC = () => {
                 console.log("useEffect/fetchData: קורא ל-getFileVersions עם id:", numericFileId);
                 const versionsResponse = await getFileVersions(numericFileId);
                 console.log("useEffect/fetchData: תגובה מ-getFileVersions:", versionsResponse);
-
+debugger;
                 console.log("useEffect/fetchData: קורא ל-fetchFileContent עם הנתיב:", fileResponse?.filePath);
                 const initialContent = await fetchFileContent(fileResponse);
 
