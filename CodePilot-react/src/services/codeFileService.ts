@@ -1,5 +1,5 @@
 import axios from "axios";
-// import API_BASE_URL from "../config";
+
 
 // פונקציה להעלאת קובץ
 export const uploadFile = async (file: File, fileName: string, language: string) => {
