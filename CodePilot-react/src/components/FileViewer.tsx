@@ -36,6 +36,8 @@ const FileViewer: React.FC = () => {
     const fetchFileContent = async (url: string) => {
         console.log("fetchFileContent: מתחיל הורדה מ:", url);
         const response = await fetch(url);
+        console.log("response: ", response);
+        
         console.log("fetchFileContent: סטטוס תגובה:", response.status);
         if (!response.ok) {
             message.error("לא ניתן להוריד את תוכן הקובץ");
