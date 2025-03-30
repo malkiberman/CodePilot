@@ -71,8 +71,8 @@ const FileViewer: React.FC = () => {
                 console.log("useEffect/fetchData: קורא ל-getFileVersions עם id:", numericFileId);
                 const versionsResponse = await getFileVersions(numericFileId);
                 console.log("useEffect/fetchData: תגובה מ-getFileVersions:", versionsResponse);
-debugger;
-                console.log("useEffect/fetchData: קורא ל-fetchFileContent עם הנתיב:", fileResponse?.filePath);
+
+                console.log("useEffect/fetchData: קורא ל-fetchFileContent עם הנתיב:", fileResponse);
                 const initialContent = await fetchFileContent(fileResponse);
 
                
@@ -88,7 +88,7 @@ debugger;
               const newFileData = {
                   id: numericFileId,
                   name: fileResponse.fileName,
-                  filePath: fileResponse.filePath, // שמירת הנתיב של הגרסה הנוכחית
+                  filePath: fileResponse, // שמירת הנתיב של הגרסה הנוכחית
                   versions: versions,
               };
               console.log("useEffect/fetchData: מעדכן fileData:", newFileData);
