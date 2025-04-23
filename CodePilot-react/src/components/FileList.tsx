@@ -17,18 +17,17 @@ const FileList: React.FC<{
   const [newFileName, setNewFileName] = useState<string>("");
   
   const navigate = useNavigate();
-
+  const fetchFiles = async () => {
+    try {
+      const data = await getUserFiles();
+      setFiles(data);
+    } catch (error) {
+      console.error("שגיאה בקבלת קבצים:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const data = await getUserFiles();
-        setFiles(data);
-      } catch (error) {
-        console.error("שגיאה בקבלת קבצים:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchFiles();
   }, []); // ✅ תלות ריקה: רק בפעם הראשונה
   
@@ -39,7 +38,10 @@ const FileList: React.FC<{
   const handleDeleteFile = async (e: React.MouseEvent, fileId: number) => {
     e.stopPropagation();
     try {
+      setIsLoading(true);
       await deleteFile(fileId);
+      await fetchFiles(); // מרענן את הרשימה
+      setIsLoading(false);
       setFiles((prevFiles) => prevFiles.filter(file => file.id !== fileId));
     } catch (error) {
       console.error("שגיאה במחיקת הקובץ:", error);
@@ -50,7 +52,10 @@ const FileList: React.FC<{
     e.stopPropagation();
     if (!fileToUpdate || !newFileName) return;
     try {
+      setIsLoading(true);
       await renameFile(fileToUpdate.id, newFileName);
+      await fetchFiles(); // מרענן את הרשימה
+      setIsLoading(false);
       setFiles((prevFiles) =>
         prevFiles.map((file) =>
           file.id === fileToUpdate.id ? { ...file, fileName: newFileName } : file
