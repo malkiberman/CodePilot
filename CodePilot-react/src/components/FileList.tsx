@@ -30,8 +30,8 @@ const FileList: React.FC<{
       }
     };
     fetchFiles();
-  }, [files]);
-
+  }, []); // ✅ תלות ריקה: רק בפעם הראשונה
+  
   const handleFileClick = (fileId: number) => {
     navigate(`/files/${fileId}`);
   };
