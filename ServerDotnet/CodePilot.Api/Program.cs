@@ -26,7 +26,8 @@ logger.AddConsole();
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
 
-// 🛠️ הוספת DbContext
+
+///נסיון
 builder.Services.AddDbContext<CodePilotDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
