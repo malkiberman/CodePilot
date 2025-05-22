@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { Button, TextField, Container, Typography, Box, InputAdornment } from '@mui/material';
+import { Button, TextField, Container, Typography, Box, InputAdornment, Paper } from '@mui/material';
 import { Email, Lock, Person, AssignmentInd } from '@mui/icons-material';
 import { registerUser } from '../services/authService';
 
@@ -41,12 +41,14 @@ const Register = () => {
           flexDirection: 'column',
           alignItems: 'center',
           marginTop: 8,
-          backgroundColor: 'white',
+          
           padding: 4,
           borderRadius: 2,
           boxShadow: 3,
+
         }}
       >
+        <Paper elevation={3} sx={{ padding: 4, width: "100%", textAlign: "center", color:"primary" }}>
         <Typography variant="h5" gutterBottom>
           Register
         </Typography>
@@ -134,6 +136,7 @@ const Register = () => {
             {message}
           </Typography>
         )}
+        </Paper>
       </Box>
     </Container>
   );

@@ -1,13 +1,16 @@
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import { FC } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import { Brightness4, Brightness7 } from "@mui/icons-material";
 interface ToolbarProps {
   isAuthenticated: boolean;
   setIsAuthenticated: (auth: boolean) => void;
+  mode: "light" | "dark"; 
+  setMode: (mode: "light" | "dark") => void;
 }
 
-const CustomToolbar: FC<ToolbarProps> = ({ isAuthenticated, setIsAuthenticated }) => {
+
+const CustomToolbar: FC<ToolbarProps> = ({ isAuthenticated, setIsAuthenticated, mode, setMode}) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -42,6 +45,10 @@ const CustomToolbar: FC<ToolbarProps> = ({ isAuthenticated, setIsAuthenticated }
             </Button>
           </>
         )}
+        <Button color="inherit" onClick={() => setMode(mode === "dark" ? "light" : "dark")}>
+  {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+</Button>
+
       </Toolbar>
     </AppBar>
   );

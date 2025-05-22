@@ -27,9 +27,10 @@ var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
 
 
-///נסיון
+
 builder.Services.AddDbContext<CodePilotDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // 🛠️ הוספת שירותי Authentication + JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -104,7 +105,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CodePilotDbContext>();
-    dbContext.Database.Migrate();
+  //  dbContext.Database.Migrate();
 }
 
 

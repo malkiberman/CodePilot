@@ -4,6 +4,7 @@ import Login from "../components/login";
 import Register from "../components/register";
 import UserFiles from "../components/uploadFile";
 import FileViewer from "../components/FileViewer";
+import HomePage from "../components/HomePage";
 
 interface AppRoutesProps {
   isAuthenticated: boolean;
@@ -17,6 +18,7 @@ const AppRoutes: FC<AppRoutesProps> = ({ isAuthenticated, setIsAuthenticated }) 
       <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/files" />} />
       <Route path="/files" element={isAuthenticated ? <UserFiles /> : <Navigate to="/login" />} />
       <Route path="/files/:fileId" element={isAuthenticated ? <FileViewer /> : <Navigate to="/login" />} />
+      <Route path="/" element={<HomePage />} />
       <Route path="*" element={<Navigate to={isAuthenticated ? "/files" : "/login"} />} />
     </Routes>
   );

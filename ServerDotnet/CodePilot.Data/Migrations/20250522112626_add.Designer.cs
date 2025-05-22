@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CodePilot.Data.Migrations
 {
     [DbContext(typeof(CodePilotDbContext))]
-    [Migration("20250326001854_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250522112626_add")]
+    partial class add
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

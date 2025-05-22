@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CodePilot.Data.Migrations
 {
     [DbContext(typeof(CodePilotDbContext))]
-    [Migration("20250316002228_AddFileVersionsTable3")]
-    partial class AddFileVersionsTable3
+    [Migration("20250522095909_new")]
+    partial class @new
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
