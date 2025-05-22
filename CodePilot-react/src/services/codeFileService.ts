@@ -167,3 +167,12 @@ export const renameFile = async (fileId: number, newFileName: string) => {
     throw error;
   }
 };
+export async function fetchFileContent(fileId: string): Promise<string> {
+  const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL||import.meta.env.REACT_APP_API_BASE_URL}/file/${fileId}`);
+  return response.data;
+}
+
+export async function fetchVersionContentByPath(versionId: string): Promise<string> {
+  const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL||import.meta.env.REACT_APP_API_BASE_URL}/version/${versionId}`);
+  return response.data;
+}
