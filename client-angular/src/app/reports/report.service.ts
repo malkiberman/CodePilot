@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportsService {
-  private baseUrl = 'https://your-api-url/api/admin';  // שנה בהתאם ל-API שלך
+  private baseUrl = `${environment.apiUrl}/admin`;  // ������ ���������� ��-API ������
 
   constructor(private http: HttpClient) {}
 
@@ -15,6 +16,6 @@ export class ReportsService {
       .set('from', from.toISOString())
       .set('to', to.toISOString());
 
-    return this.http.get<any[]>(`${this.baseUrl}/active-users`, { params });
+    return this.http.get<any[]>(`${this.baseUrl}/active`, { params });
   }
 }

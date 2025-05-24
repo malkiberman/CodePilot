@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { ReportsService } from './reports.service';
+import { ReportsService } from './report.service';
 import { CommonModule } from '@angular/common';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { NgxChartsModule, ScaleType } from '@swimlane/ngx-charts';
+import { Color } from '@swimlane/ngx-charts';
 
 @Component({
   selector: 'app-reports',
   standalone: true,
   imports: [CommonModule, NgxChartsModule],
+  providers: [ReportsService],  // �������� ������
+
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.scss']
 })
@@ -15,8 +18,11 @@ export class ReportsComponent implements OnInit {
   loading = false;
   error = '';
 
-  colorScheme = {
-    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA']
+  colorScheme:Color = {
+    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
+    name: '',
+    selectable: false,
+    group: ScaleType.Time
   };
 
   constructor(private reportsService: ReportsService) {}
