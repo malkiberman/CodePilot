@@ -91,7 +91,7 @@ builder.Services.AddScoped<ICodeFileRepository, CodeFileRepository>();
 builder.Services.AddScoped<IFileVersionRepository, FileVersionRepository>();
 builder.Services.AddScoped<S3Service>(); // שירות לניהול קבצים ב-S3
 builder.Services.AddScoped<IFileVersionService, FileVersionService>();
-
+builder.Services.AddScoped<IUserService, UserService>();
 // 🛠️ הוספת שירותים עבור Authentication
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
