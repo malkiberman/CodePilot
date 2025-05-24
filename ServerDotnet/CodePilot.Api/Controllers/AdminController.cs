@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CodePilot.Api.Controllers
 {
-    [ApiController]
     [Route("api/admin")]
+    [ApiController]
     public class AdminController : Controller
     {
         private readonly IUserService _userService;
