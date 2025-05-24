@@ -73,13 +73,6 @@ const Register = () => {
       icon: <Lock color="primary" />,
       type: "password",
     },
-    {
-      label: "Role",
-      value: role,
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => setRole(e.target.value),
-      icon: <AssignmentInd color="primary" />,
-      type: "text",
-    },
   ]
 
   return (

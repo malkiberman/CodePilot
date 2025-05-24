@@ -8,7 +8,7 @@ import { environment } from '../../environment';
   providedIn: 'root',
 })
 export class UserService {
-  private apiUrl = environment.apiUrl;
+  private apiUrl = `${environment.apiUrl}/admin`;
   constructor(private http: HttpClient) {}
 
   getUsers(): Observable<User[]> {
