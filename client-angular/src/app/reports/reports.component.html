@@ -1,1 +1,16 @@
-<p>reports works!</p>
+<div *ngIf="loading" class="loading">טוען דוחות...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<ngx-charts-bar-vertical
+  *ngIf="reportData.length"
+  [view]="[700, 400]"
+  [results]="reportData"
+  [xAxis]="true"
+  [yAxis]="true"
+  [legend]="false"
+  [showDataLabel]="true"
+  [scheme]="colorScheme"
+  [gradient]="false"
+  [roundDomains]="true"
+>
+</ngx-charts-bar-vertical>
