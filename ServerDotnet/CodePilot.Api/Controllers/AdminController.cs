@@ -12,11 +12,13 @@ namespace CodePilot.Api.Controllers
     {
         private readonly IUserService _userService;
         private readonly IAuthService _authService;
+      
 
         public AdminController(IUserService userService,IAuthService authService)
         {
             _userService = userService;
             _authService = authService;
+            
 
         }
 
@@ -57,5 +59,27 @@ namespace CodePilot.Api.Controllers
 
             return Ok(response);
         }
+      
+        [HttpGet("active")]
+        public async Task<IActionResult> GetActiveUsersReport([FromQuery] DateTime from, [FromQuery] DateTime to)
+        {
+            var report = await _userService.GetActiveUsersReportAsync(from, to);
+            return Ok(report);
+        }
+
+        [HttpGet("total-count")]
+        public async Task<IActionResult> GetTotalUsersCount()
+        {
+            var count = await _userService.GetTotalUsersCountAsync();
+            return Ok(count);
+        }
+
+        [HttpGet("new-count")]
+        public async Task<IActionResult> GetNewUsersCount([FromQuery] DateTime from, [FromQuery] DateTime to)
+        {
+            var count = await _userService.GetNewUsersCountAsync(from, to);
+            return Ok(count);
+        }
+
     }
 }
