@@ -24,7 +24,7 @@ const Register = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [username, setUsername] = useState("")
-  const [role, setRole] = useState("")
+  
   const [message, setMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const theme = useTheme()
@@ -34,14 +34,14 @@ const Register = () => {
     setIsSubmitting(true)
     setMessage("")
 
-    if (!email || !password || !username || !role) {
+    if (!email || !password || !username ) {
       setMessage("Please fill in all fields.")
       setIsSubmitting(false)
       return
     }
 
     try {
-      const data = await registerUser(username, email, password, role)
+      const data = await registerUser(username, email, password)
       localStorage.setItem("token", data.token)
       setMessage(`Registration successful! Welcome ${data.username}`)
     } catch (error) {

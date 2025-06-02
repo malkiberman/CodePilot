@@ -59,8 +59,8 @@ namespace CodePilot.Api.Controllers
 
             return Ok(response);
         }
-      
-        [HttpGet("active")]
+        [Route("active")]
+        [HttpGet]
         public async Task<IActionResult> GetActiveUsersReport([FromQuery] DateTime from, [FromQuery] DateTime to)
         {
             var report = await _userService.GetActiveUsersReportAsync(from, to);
