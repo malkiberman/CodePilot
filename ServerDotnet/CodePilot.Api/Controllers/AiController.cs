@@ -21,6 +21,8 @@ namespace CodePilot.Api.Controllers
         [HttpPost("analyze")]
         public async Task<string> AnalyzeFile([FromBody] string content)
         {
+            Console.WriteLine("controller");
+            Console.WriteLine("content"+content);
             if (string.IsNullOrWhiteSpace(content))
                 return "No content provided.";
 
