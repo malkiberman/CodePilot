@@ -1,17 +1,206 @@
-.navbar {
-  background-color: #2c3e50;
-  padding: 10px 20px;
+.modern-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(156, 39, 176, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
   display: flex;
-  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
   direction: rtl;
 }
 
-.navbar a {
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: white;
-  text-decoration: none;
-  font-weight: bold;
 }
 
-.navbar a.active {
-  border-bottom: 2px solid #00e676;
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-shape {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(45deg, #9c27b0, #00e676);
+  border-radius: 8px;
+  animation: rotate 4s linear infinite;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #9c27b0, #00e676, #9c27b0);
+    border-radius: 10px;
+    z-index: -1;
+    animation: pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.brand-text {
+  background: linear-gradient(45deg, #9c27b0, #00e676);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  color: #b0b0b0;
+  text-decoration: none;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+  overflow: hidden;
+  
+  &:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(156, 39, 176, 0.3);
+  }
+  
+  &.active {
+    color: white;
+    background: linear-gradient(45deg, rgba(156, 39, 176, 0.3), rgba(0, 230, 118, 0.3));
+    border-color: rgba(156, 39, 176, 0.5);
+    
+    .nav-glow {
+      opacity: 1;
+    }
+  }
+}
+
+.nav-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.nav-text {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.nav-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(156, 39, 176, 0.2), rgba(0, 230, 118, 0.2));
+  border-radius: 25px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  filter: blur(10px);
+}
+
+.navbar-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.effect-orb {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: float-orb 8s ease-in-out infinite;
+  
+  &.orb-1 {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(45deg, #9c27b0, #673ab7);
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+  
+  &.orb-2 {
+    width: 15px;
+    height: 15px;
+    background: linear-gradient(45deg, #00e676, #4caf50);
+    top: 60%;
+    right: 20%;
+    animation-delay: 4s;
+  }
+}
+
+@keyframes float-orb {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  25% { transform: translateY(-10px) translateX(5px); }
+  50% { transform: translateY(0px) translateX(10px); }
+  75% { transform: translateY(10px) translateX(5px); }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .navbar-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .nav-link {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .nav-text {
+    display: none;
+  }
 }

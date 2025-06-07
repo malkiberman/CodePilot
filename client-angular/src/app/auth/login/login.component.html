@@ -1,33 +1,65 @@
-<div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
-    <mat-card style="width: 300px;">
-      <mat-card-title style="text-align: center;">התחברות</mat-card-title>
-      <mat-card-content>
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="outline" style="width: 100%;">
-            <mat-label>שם משתמש</mat-label>
-            <input matInput formControlName="email" required>
-            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
-              שם משתמש הוא חובה.
-            </mat-error>
-          </mat-form-field>
-  
-          <mat-form-field appearance="outline" style="width: 100%; margin-top: 16px;">
-            <mat-label>סיסמה</mat-label>
-            <input matInput type="password" formControlName="password" required>
-            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-              סיסמה היא חובה.
-            </mat-error>
-          </mat-form-field>
-  
-          <div style="margin-top: 24px; text-align: center;">
-            <button mat-raised-button color="primary" type="submit" [disabled]="loading">
-              {{ loading ? 'מתחבר...' : 'התחבר' }}
-            </button>
-            <div *ngIf="loginError" style="color: red; margin-top: 10px;">
-              {{ loginError }}
-            </div>
-          </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
+<div class="login-container">
+  <div class="login-background">
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
   </div>
+  
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-icon">
+        <div class="icon-circle">
+          <span class="icon-emoji">🔐</span>
+        </div>
+      </div>
+      <h1 class="login-title">System Login</h1>
+      <p class="login-subtitle">Enter your login credentials</p>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="email" required>
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            Username is required.
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-group">
+        <mat-form-field appearance="outline" class="custom-field">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="password" required>
+          <mat-icon matSuffix>lock</mat-icon>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Password is required.
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-actions">
+        <button mat-raised-button type="submit" class="login-btn" [disabled]="loading">
+          <span *ngIf="!loading" class="btn-content">
+            <mat-icon>login</mat-icon>
+            Login
+          </span>
+          <span *ngIf="loading" class="btn-loading">
+            <div class="spinner"></div>
+            Logging in...
+          </span>
+        </button>
+        
+        <div *ngIf="loginError" class="error-message">
+          <mat-icon>error</mat-icon>
+          {{ loginError }}
+        </div>
+      </div>
+    </form>
+    
+    <div class="login-footer">
+      <p>Advanced Management System</p>
+    </div>
+  </div>
+</div>

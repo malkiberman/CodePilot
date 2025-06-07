@@ -1,5 +1,38 @@
-<nav class="navbar">
-  <a routerLink="/login" routerLinkActive="active">התחברות</a>
-  <a routerLink="/users" routerLinkActive="active">משתמשים</a>
-  <a routerLink="/reports" routerLinkActive="active">דוחות</a>
+<nav class="modern-navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <div class="brand-icon">
+        <div class="icon-shape"></div>
+      </div>
+      <span class="brand-text">Dashboard</span>
+    </div>
+    
+    <div class="navbar-menu">
+      <a routerLink="/home" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-text">Home</span>
+        <div class="nav-glow"></div>
+      </a>
+      <a routerLink="/login" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">🔐</span>
+        <span class="nav-text">Login</span>
+        <div class="nav-glow"></div>
+      </a>
+      <a routerLink="/users" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">👥</span>
+        <span class="nav-text">Users</span>
+        <div class="nav-glow"></div>
+      </a>
+      <a routerLink="/reports" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📊</span>
+        <span class="nav-text">Reports</span>
+        <div class="nav-glow"></div>
+      </a>
+    </div>
+    
+    <div class="navbar-effects">
+      <div class="effect-orb orb-1"></div>
+      <div class="effect-orb orb-2"></div>
+    </div>
+  </div>
 </nav>

@@ -96,6 +96,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddHttpClient<AiService>();
+builder.Services.AddScoped<IAiService>(sp => (IAiService)sp.GetRequiredService<AiService>());
+
 
 // 🛠️ הוספת Controllers
 builder.Services.AddControllers();

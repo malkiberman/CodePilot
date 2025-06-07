@@ -8,9 +8,9 @@ export const registerUser = async (username: string, email: string, password: st
       username,
       email,
       password,
-      role
+      role: role ? role : "user" // ���� ���� �������� ����������, ���������� ���������� ������ "user"
     });
-    console.log(response.data);
+    console.log(response.data? response.data : "No data in response");
   
 
     localStorage.setItem("token", response.data.data);

@@ -1,38 +1,154 @@
+<div class="users-container">
+  <div class="users-background">
+    <div class="bg-element element-1"></div>
+    <div class="bg-element element-2"></div>
+    <div class="bg-element element-3"></div>
+  </div>
 
-<h1>רשימת משתמשים</h1>
+  <div class="users-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <div class="icon-container">
+          👥
+        </div>
+      </div>
+      <h1 class="page-title">User Management</h1>
+      <p class="page-subtitle">View and manage all system users</p>
+    </div>
+  </div>
 
-<div *ngIf="loading">טוען משתמשים...</div>
-<div *ngIf="error" style="color: red;">{{ error }}</div>
+  <div class="users-content">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-section">
+      <div class="loading-animation">
+        <div class="loading-dots">
+          <div class="dot dot-1"></div>
+          <div class="dot dot-2"></div>
+          <div class="dot dot-3"></div>
+        </div>
+        <p class="loading-message">Loading users...</p>
+      </div>
+    </div>
 
-<mat-accordion *ngIf="users.length > 0 && !loading && !error">
-  <mat-expansion-panel *ngFor="let user of users">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        {{ user.username }} <span *ngIf="user.email">({{ user.email }})</span>
-      </mat-panel-title>
-    </mat-expansion-panel-header>
+    <!-- Error State -->
+    <div *ngIf="error" class="error-section">
+      <div class="error-card">
+        <div class="error-icon">⚠️</div>
+        <h3>Error loading users</h3>
+        <p>{{ error }}</p>
+        <button mat-raised-button class="retry-button" (click)="loadUsers()">
+          <span>🔄</span>
+          Try Again
+        </button>
+      </div>
+    </div>
 
-    <mat-list>
-      <mat-list-item *ngIf="user.id">
-        <mat-icon matListItemIcon>fingerprint</mat-icon>
-        <div matListItemTitle>ID</div>
-        <div matListItemLine>{{ user.id }}</div>
-      </mat-list-item>
-      <mat-list-item *ngIf="user.created_at">
-        <mat-icon matListItemIcon>calendar_today</mat-icon>
-        <div matListItemTitle>נוצר בתאריך</div>
-        <div matListItemLine>{{ user.created_at | date }}</div>
-      </mat-list-item>
-    </mat-list>
+    <!-- Users List -->
+    <div *ngIf="users.length > 0 && !loading && !error" class="users-list">
+      <div class="list-header">
+        <h2 class="list-title">User List ({{ users.length }})</h2>
+        <div class="list-actions">
+          <button mat-raised-button class="refresh-btn" (click)="loadUsers()">
+            <span class="btn-icon">🔄</span>
+            Refresh
+          </button>
+        </div>
+      </div>
 
-    <mat-panel-description>
-      <button mat-icon-button color="warn" (click)="deleteUser(user.id!)">
-        <mat-icon>delete</mat-icon>
-      </button>
-    </mat-panel-description>
-  </mat-expansion-panel>
-</mat-accordion>
+      <div class="users-grid">
+        <div class="user-card" *ngFor="let user of users; let i = index" 
+             [style.animation-delay.ms]="i * 100">
+          <div class="card-header">
+            <div class="user-avatar">
+              <span class="avatar-text">{{ getUserInitials(user.username) }}</span>
+            </div>
+            <div class="user-info">
+              <h3 class="user-name">{{ user.username }}</h3>
+              <p class="user-email" *ngIf="user.email">{{ user.email }}</p>
+            </div>
+            <div class="user-status">
+              <div class="status-indicator active"></div>
+              <span class="status-text">Active</span>
+            </div>
+          </div>
 
-<div *ngIf="users.length === 0 && !loading && !error">
-  אין משתמשים במערכת.
+          <div class="card-content">
+            <div class="user-details">
+              <div class="detail-item" *ngIf="user.id">
+                <div class="detail-icon">🆔</div>
+                <div class="detail-content">
+                  <span class="detail-label">User ID</span>
+                  <span class="detail-value">{{ user.id }}</span>
+                </div>
+              </div>
+              
+              <div class="detail-item" *ngIf="user.created_at">
+                <div class="detail-icon">📅</div>
+                <div class="detail-content">
+                  <span class="detail-label">Join Date</span>
+                  <span class="detail-value">{{ user.created_at | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button mat-raised-button class="action-btn edit-btn">
+              <span class="btn-icon">✏️</span>
+              Edit
+            </button>
+            <button mat-raised-button class="action-btn delete-btn" 
+                    (click)="deleteUser(user.id!)">
+              <span class="btn-icon">🗑️</span>
+              Delete
+            </button>
+          </div>
+
+          <div class="card-glow"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="users.length === 0 && !loading && !error" class="empty-section">
+      <div class="empty-card">
+        <div class="empty-icon">👤</div>
+        <h3>No users in the system</h3>
+        <p>No registered users found in the system</p>
+        <button mat-raised-button class="add-user-btn">
+          <span class="btn-icon">➕</span>
+          Add New User
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Summary -->
+  <div *ngIf="users.length > 0 && !loading && !error" class="stats-summary">
+    <div class="summary-card">
+      <div class="summary-item">
+        <div class="summary-icon icon-purple">👥</div>
+        <div class="summary-content">
+          <span class="summary-value">{{ users.length }}</span>
+          <span class="summary-label">Total Users</span>
+        </div>
+      </div>
+      
+      <div class="summary-item">
+        <div class="summary-icon icon-green">✅</div>
+        <div class="summary-content">
+          <span class="summary-value">{{ getActiveUsersCount() }}</span>
+          <span class="summary-label">Active Users</span>
+        </div>
+      </div>
+      
+      <div class="summary-item">
+        <div class="summary-icon icon-purple">📊</div>
+        <div class="summary-content">
+          <span class="summary-value">{{ getRecentUsersCount() }}</span>
+          <span class="summary-label">Joined This Week</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

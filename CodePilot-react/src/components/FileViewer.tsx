@@ -1,5 +1,5 @@
 "use client";
-
+import FileAnalyzer from "../components/FileAnalyzer";
 import { useState, useEffect, useRef } from "react";
 import { diffLines } from "diff";
 import {
@@ -142,7 +142,7 @@ const FileViewer = () => {
             });
         } else {
           console.log(`[useEffect] אין גרסאות, טוען תוכן קובץ ראשי: ${fileResponse.filePath}`); // אין גרסאות, טוען תוכן קובץ ראשי
-          const initialContent = await fetchFileContent(fileResponse.filePath);
+          const initialContent = await fetchFileContent(fileResponse);
           setDisplayedContent(initialContent);
           console.log(`[useEffect] תוכן קובץ ראשי נטען בהצלחה.`); // תוכן קובץ ראשי נטען בהצלחה
         }

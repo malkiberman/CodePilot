@@ -1,16 +1,109 @@
-<div *ngIf="loading" class="loading">טוען דוחות...</div>
-<div *ngIf="error" class="error">{{ error }}</div>
+<div class="reports-container">
+  <div class="reports-background">
+    <div class="bg-particle particle-1"></div>
+    <div class="bg-particle particle-2"></div>
+    <div class="bg-particle particle-3"></div>
+    <div class="bg-particle particle-4"></div>
+  </div>
 
-<ngx-charts-bar-vertical
-  *ngIf="reportData.length"
-  [view]="[700, 400]"
-  [results]="reportData"
-  [xAxis]="true"
-  [yAxis]="true"
-  [legend]="false"
-  [showDataLabel]="true"
-  [scheme]="colorScheme"
-  [gradient]="false"
-  [roundDomains]="true"
->
-</ngx-charts-bar-vertical>
+  <div class="reports-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <div class="icon-wrapper">
+          📊
+        </div>
+      </div>
+      <h1 class="page-title">Reports & Analytics</h1>
+      <p class="page-subtitle">Track user activity in the system</p>
+    </div>
+  </div>
+
+  <div class="reports-content">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="loading-text">Loading reports...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+      <div class="error-icon">⚠️</div>
+      <h3>Error loading reports</h3>
+      <p>{{ error }}</p>
+      <button mat-raised-button class="retry-btn" (click)="loadReport()">
+        Try Again
+      </button>
+    </div>
+
+    <!-- Chart Container -->
+    <div *ngIf="reportData.length && !loading && !error" class="chart-container">
+      <div class="chart-header">
+        <h2 class="chart-title">User Activity - Last Month</h2>
+        <div class="chart-stats">
+          <div class="stat-item">
+            <span class="stat-label">Total Logins:</span>
+            <span class="stat-value">{{ getTotalLogins() }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chart-wrapper">
+        <ngx-charts-bar-vertical
+          [view]="[800, 400]"
+          [results]="reportData"
+          [xAxis]="true"
+          [yAxis]="true"
+          [legend]="false"
+          [showDataLabel]="true"
+          [scheme]="colorScheme"
+          [gradient]="true"
+          [roundDomains]="true"
+          [showGridLines]="true"
+          [animations]="true"
+          (select)="onChartSelect($event)"
+        >
+        </ngx-charts-bar-vertical>
+      </div>
+      
+      <div class="chart-legend">
+        <div class="legend-item">
+          <div class="legend-color color-purple"></div>
+          <span>Active Users</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color color-green"></div>
+          <span>Daily Logins</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="reportData.length === 0 && !loading && !error" class="empty-container">
+      <div class="empty-icon">📈</div>
+      <h3>No data to display</h3>
+      <p>No activity data found for the selected period</p>
+    </div>
+  </div>
+
+  <!-- Additional Stats Cards -->
+  <div *ngIf="reportData.length && !loading && !error" class="stats-grid">
+    <div class="stats-card" *ngFor="let stat of getAdditionalStats(); let i = index" 
+         [style.animation-delay.ms]="i * 150">
+      <div class="stats-icon" [class]="'icon-' + stat.color">
+        <span>{{ stat.icon }}</span>
+      </div>
+      <div class="stats-content">
+        <h4 class="stats-title">{{ stat.title }}</h4>
+        <p class="stats-value">{{ stat.value }}</p>
+        <span class="stats-change" [class]="stat.trend">
+          {{ stat.change }}
+        </span>
+      </div>
+      <div class="stats-glow" [class]="'glow-' + stat.color"></div>
+    </div>
+  </div>
+</div>
