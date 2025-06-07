@@ -121,12 +121,22 @@ if (app.Environment.IsDevelopment())
 }
 
 
+//app.UseRouting();
+
+//app.UseCors("AllowAll");
+//app.UseHttpsRedirection();
+//app.UseAuthentication(); 
+//app.UseAuthorization();
+//app.MapControllers();
 app.UseRouting();
 
-app.UseCors("AllowAll");
-app.UseHttpsRedirection();
-app.UseAuthentication(); 
+app.UseCors("AllowAll"); // ✨ חובה כאן לפני הכל
+
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHttpsRedirection(); // או אפילו להעיף בפיתוח
+
 app.MapControllers();
 
 app.Run();

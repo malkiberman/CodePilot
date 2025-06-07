@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Spin, message, List, Typography, Drawer } from "antd";
 import { RobotOutlined } from "@ant-design/icons";
+import axios from "axios";
 
 interface Props {
   content: string | null;
@@ -11,38 +12,40 @@ const FileAnalyzer: React.FC<Props> = ({ content }) => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
 
-  const analyzeFile = async () => {
-    if (!content) {
-      message.warning("No content to analyze");
-      return;
-    }
+ const analyzeFile = async () => {
+  if (!content) {
+    message.warning("No content to analyze");
+    return;
+  }
 
-    setLoading(true);
-    setSuggestions([]);
+  setLoading(true);
+  setSuggestions([]);
 
-    try {
-      const response = await fetch("https://codepilot-6qnc.onrender.com/api/ai/analyze", {
-        method: "POST",
+  try {
+      const token = sessionStorage.getItem("token");
+
+    const response = await axios.post(
+      "https://codepilot-6qnc.onrender.com/api/Ai/analyze",
+      { content }, // שולח כאובייקט – אם השרת מצפה למבנה כזה
+      {
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify(content), // שולח את התוכן שקיבלת כפרופס
-      });
-
-      if (!response.ok) {
-        throw new Error("Server error");
       }
+    );
 
-      const data = await response.text(); // לקבל מחרוזת ארוכה
-      setSuggestions([data]); // מכניס למערך להצגה ברשימה
-      setOpen(true);
-    } catch (error: any) {
-      console.error("Error analyzing file:", error);
-      message.error("Failed to analyze file");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const data = response.data;
+    setSuggestions([data]);
+    setOpen(true);
+  } catch (error: any) {
+    console.error("Error analyzing file:", error);
+    message.error("Failed to analyze file");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <>
