@@ -12,7 +12,8 @@ const FileAnalyzer: React.FC<Props> = ({ content }) => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [open, setOpen] = useState(false);
 
- const analyzeFile = async () => {
+// בקובץ FileAnalyzer.tsx
+const analyzeFile = async () => {
   if (!content) {
     message.warning("No content to analyze");
     return;
@@ -22,14 +23,14 @@ const FileAnalyzer: React.FC<Props> = ({ content }) => {
   setSuggestions([]);
 
   try {
-      const token = sessionStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     const response = await axios.post(
-      "https://codepilot-6qnc.onrender.com/api/Ai/analyze",
-      { content }, // שולח כאובייקט – אם השרת מצפה למבנה כזה
+      `https://codepilot-6qnc.onrender.com/api/Ai/analyze`,
+      content, // <--- ������ ������������ ���� �������������� 'content' ���������� ��������������
       {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json", // וודא שזה נשאר 'application/json'
           "Authorization": `Bearer ${token}`,
         },
       }
@@ -45,7 +46,6 @@ const FileAnalyzer: React.FC<Props> = ({ content }) => {
     setLoading(false);
   }
 };
-
 
   return (
     <>

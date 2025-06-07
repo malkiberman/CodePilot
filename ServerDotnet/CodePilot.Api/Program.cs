@@ -98,6 +98,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddHttpClient<IAiService, AiService>(); // או רק AddHttpClient() אם AiService לא לוקח פרמטרים אחרים בקונסטרוקטור שאינם ניתנים להזרקה
+
 builder.Services.AddScoped<IAiService, AiService>();
 
 
@@ -121,13 +123,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-//app.UseRouting();
 
-//app.UseCors("AllowAll");
-//app.UseHttpsRedirection();
-//app.UseAuthentication(); 
-//app.UseAuthorization();
-//app.MapControllers();
 app.UseRouting();
 
 app.UseCors("AllowAll"); // ✨ חובה כאן לפני הכל

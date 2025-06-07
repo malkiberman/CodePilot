@@ -4,7 +4,6 @@ using CodePilot.Services.IServices;
 using CodePilot.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using CodePilot.Services.Services;
 namespace CodePilot.Api.Controllers
 {
     [Route("api/ai")]
