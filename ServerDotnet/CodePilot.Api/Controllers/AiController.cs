@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using CodePilot.Services.Services;
 namespace CodePilot.Api.Controllers
 {
+    [Route("api/ai")]
     [ApiController]
-    [Route("api/[controller]")]
     public class AiController : Controller
     {
         private readonly IAiService _aiService;
