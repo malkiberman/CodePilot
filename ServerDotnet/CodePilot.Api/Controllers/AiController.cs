@@ -19,13 +19,13 @@ namespace CodePilot.Api.Controllers
         }
 
         [HttpPost("analyze")]
-        public async Task<IActionResult> AnalyzeFile([FromBody] string content)
+        public async Task<string> AnalyzeFile([FromBody] string content)
         {
             if (string.IsNullOrWhiteSpace(content))
-                return BadRequest("No content provided.");
+                return "No content provided.";
 
             string suggestions = await _aiService.GetCodeImprovementsAsync(content);
-            return Ok(suggestions); // או Json(new { suggestions }) אם רוצים עטיפה
+            return suggestions; 
         }
     }
 }

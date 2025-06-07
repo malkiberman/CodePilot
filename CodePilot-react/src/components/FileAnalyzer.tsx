@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button, Spin, message, List, Typography, Drawer } from "antd";
 import { RobotOutlined } from "@ant-design/icons";
 
@@ -21,20 +21,20 @@ const FileAnalyzer: React.FC<Props> = ({ content }) => {
     setSuggestions([]);
 
     try {
-const response = await fetch("https://codepilot-6qnc.onrender.com/api/ai/analyze", {
+      const response = await fetch("https://codepilot-6qnc.onrender.com/api/ai/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify("public class MyClass { }"), // כי השרת מקבל סטרינג ישיר
+        body: JSON.stringify(content), // שולח את התוכן שקיבלת כפרופס
       });
 
       if (!response.ok) {
         throw new Error("Server error");
       }
 
-      const data = await response.json();
-      setSuggestions(Array.isArray(data) ? data : data.suggestions || []);
+      const data = await response.text(); // לקבל מחרוזת ארוכה
+      setSuggestions([data]); // מכניס למערך להצגה ברשימה
       setOpen(true);
     } catch (error: any) {
       console.error("Error analyzing file:", error);
@@ -46,7 +46,6 @@ const response = await fetch("https://codepilot-6qnc.onrender.com/api/ai/analyze
 
   return (
     <>
-      {/* כפתור צף בצד שמאל למטה */}
       <div
         style={{
           position: "fixed",
@@ -61,13 +60,12 @@ const response = await fetch("https://codepilot-6qnc.onrender.com/api/ai/analyze
           icon={<RobotOutlined />}
           size="large"
           onClick={analyzeFile}
-          disabled={!content}
+          disabled={!content || loading}
         >
           לניתוח הקוד
         </Button>
       </div>
 
-      {/* Drawer שמופיע עם ההצעות */}
       <Drawer
         title="הצעות מבוססות AI"
         placement="left"
