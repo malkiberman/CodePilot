@@ -28,6 +28,8 @@ var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
 
 
 
+
+
 builder.Services.AddDbContext<CodePilotDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -96,8 +98,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-builder.Services.AddHttpClient<AiService>();
-builder.Services.AddScoped<IAiService>(sp => (IAiService)sp.GetRequiredService<AiService>());
+builder.Services.AddScoped<IAiService, AiService>();
 
 
 // 🛠️ הוספת Controllers

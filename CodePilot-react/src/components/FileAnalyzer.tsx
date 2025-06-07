@@ -26,7 +26,7 @@ const response = await fetch("https://codepilot-6qnc.onrender.com/api/ai/analyze
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(content), // כי השרת מקבל סטרינג ישיר
+        body: JSON.stringify("public class MyClass { }"), // כי השרת מקבל סטרינג ישיר
       });
 
       if (!response.ok) {

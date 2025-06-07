@@ -8,6 +8,7 @@ namespace CodePilot.Services.IServices
 {
    public interface IAiService
     {
+
         Task<string> GetCodeImprovementsAsync(string codeContent);
 
     }

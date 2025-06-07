@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CodePilot.Services.IServices;
+using Microsoft.Extensions.Configuration;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CodePilot.Services.Services
 {
-    public class AiService
+    public class AiService : IAiService
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
@@ -21,7 +22,6 @@ namespace CodePilot.Services.Services
             _model = configuration["OpenAI_Model"] ?? "gpt-4";
             _endpoint = configuration["OpenAI_Endpoint"] ?? "https://api.openai.com/v1/chat/completions";
         }
-
         public async Task<string> GetCodeImprovementsAsync(string codeContent)
         {
             var prompt = "You are a senior code reviewer. " +
