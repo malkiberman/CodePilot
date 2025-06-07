@@ -2,6 +2,7 @@
 import FileAnalyzer from "../components/FileAnalyzer";
 import { useState, useEffect, useRef } from "react";
 import { diffLines } from "diff";
+
 import {
   Typography,
   Button,
@@ -142,7 +143,7 @@ const FileViewer = () => {
             });
         } else {
           console.log(`[useEffect] אין גרסאות, טוען תוכן קובץ ראשי: ${fileResponse.filePath}`); // אין גרסאות, טוען תוכן קובץ ראשי
-          const initialContent = await fetchFileContent(fileResponse);
+          const initialContent = await fetchFileContent(fileResponse.filePath);
           setDisplayedContent(initialContent);
           console.log(`[useEffect] תוכן קובץ ראשי נטען בהצלחה.`); // תוכן קובץ ראשי נטען בהצלחה
         }
@@ -450,6 +451,13 @@ const FileViewer = () => {
               {displayedContent || "// No content to display"}
             </SyntaxHighlighter>
           </Box>
+
+{displayedContent && (
+  <Box mt={4}>
+    <Typography.Title level={5}>הצעות שיפור של AI</Typography.Title>
+    <FileAnalyzer  content={displayedContent} />
+  </Box>
+)}
 
           {fileData.versions.length > 0 && (
             <Box

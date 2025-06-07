@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Button, Spin, message, List, Typography } from "antd";
+import { Button, Spin, message, List, Typography, Drawer } from "antd";
+import { RobotOutlined } from "@ant-design/icons";
 
 interface Props {
   content: string | null;
@@ -8,6 +9,7 @@ interface Props {
 const FileAnalyzer: React.FC<Props> = ({ content }) => {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
 
   const analyzeFile = async () => {
     if (!content) {
@@ -19,12 +21,12 @@ const FileAnalyzer: React.FC<Props> = ({ content }) => {
     setSuggestions([]);
 
     try {
-      const response = await fetch("/api/ai/analyze", {
+const response = await fetch("https://codepilot-6qnc.onrender.com/api/ai/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify(content), // כי השרת מקבל סטרינג ישיר
       });
 
       if (!response.ok) {
@@ -32,7 +34,8 @@ const FileAnalyzer: React.FC<Props> = ({ content }) => {
       }
 
       const data = await response.json();
-      setSuggestions(data.suggestions || []);
+      setSuggestions(Array.isArray(data) ? data : data.suggestions || []);
+      setOpen(true);
     } catch (error: any) {
       console.error("Error analyzing file:", error);
       message.error("Failed to analyze file");
@@ -42,23 +45,51 @@ const FileAnalyzer: React.FC<Props> = ({ content }) => {
   };
 
   return (
-    <div style={{ marginTop: 24 }}>
-      <Button type="primary" onClick={analyzeFile} disabled={!content}>
-        Analyze with AI
-      </Button>
+    <>
+      {/* כפתור צף בצד שמאל למטה */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 20,
+          left: 20,
+          zIndex: 1000,
+        }}
+      >
+        <Button
+          type="primary"
+          shape="round"
+          icon={<RobotOutlined />}
+          size="large"
+          onClick={analyzeFile}
+          disabled={!content}
+        >
+          לניתוח הקוד
+        </Button>
+      </div>
 
-      {loading && <Spin style={{ marginLeft: 16 }} />}
-
-      {suggestions.length > 0 && (
-        <List
-          header={<Typography.Title level={5}>AI Suggestions</Typography.Title>}
-          bordered
-          dataSource={suggestions}
-          renderItem={(item) => <List.Item>{item}</List.Item>}
-          style={{ marginTop: 16 }}
-        />
-      )}
-    </div>
+      {/* Drawer שמופיע עם ההצעות */}
+      <Drawer
+        title="הצעות מבוססות AI"
+        placement="left"
+        onClose={() => setOpen(false)}
+        open={open}
+        width={350}
+      >
+        {loading ? (
+          <Spin />
+        ) : suggestions.length > 0 ? (
+          <List
+            bordered
+            dataSource={suggestions}
+            renderItem={(item) => <List.Item>{item}</List.Item>}
+          />
+        ) : (
+          <Typography.Text type="secondary">
+            אין הצעות להצגה.
+          </Typography.Text>
+        )}
+      </Drawer>
+    </>
   );
 };
 
