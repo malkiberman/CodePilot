@@ -35,7 +35,7 @@ import {
   MoreVert as MoreVertIcon,
 } from "@mui/icons-material"
 import { motion, AnimatePresence } from "framer-motion"
-import { deleteFile, renameFile } from "../../services/fileService"
+import { deleteFile, getFileById, renameFile } from "../../services/fileService"
 import { getLanguageFromFileName } from "../../utils"
 import type { CodeFile } from "../../types"
 import LoadingSpinner from "../UI/LoadingSpinner"
@@ -101,24 +101,33 @@ const FileList = ({ files, setFiles, loading = false }: FileListProps) => {
     handleMenuClose()
   }
 
-  const handleRename = async () => {
-    if (!renameDialog.file || !newFileName.trim()) {
-      setErrorMessage("File name cannot be empty")
-      return
-    }
-
-    try {
-      await renameFile(renameDialog.file.id, newFileName)
-      setFiles((prevFiles) =>
-        prevFiles.map((file) => (file.id === renameDialog.file!.id ? { ...file, fileName: newFileName } : file)),
-      )
-      setRenameDialog({ open: false, file: null })
-      setErrorMessage("")
-    } catch (error) {
-      console.error("Error renaming file:", error)
-      setErrorMessage("Failed to rename file. Please try again.")
-    }
+const handleRename = async () => {
+  if (!renameDialog.file || !newFileName.trim()) {
+    setErrorMessage("File name cannot be empty");
+    return;
   }
+
+  try {
+    await renameFile(renameDialog.file.id, newFileName);
+
+    // ❗ שליפת הקובץ המעודכן מהשרת – חשוב!
+    const updatedFile = await getFileById(renameDialog.file.id);
+
+    // ⬅️ עדכון state עם הקובץ המעודכן במדויק
+    setFiles((prevFiles) =>
+      prevFiles.map((file) =>
+        file.id === updatedFile.id ? updatedFile : file
+      )
+    );
+
+    setRenameDialog({ open: false, file: null });
+    setErrorMessage("");
+  } catch (error) {
+    console.error("Error renaming file:", error);
+    setErrorMessage("Failed to rename file. Please try again.");
+  }
+};
+
 
   const handleDelete = async () => {
     if (!deleteDialog.fileId) return
