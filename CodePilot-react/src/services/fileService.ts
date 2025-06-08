@@ -117,6 +117,8 @@ export const uploadFileVersion = async (fileId: number, file: File, fileName: st
 // Content Fetching
 export const fetchFileContent = async (filePath: string): Promise<string> => {
   try {
+    console.log("Fetching file content from:", filePath);
+    
     const response = await fetch(filePath)
     if (!response.ok) {
       throw new Error("Failed to fetch file content")
