@@ -279,7 +279,7 @@ namespace CodePilot.Api.Controllers
                 {
                     return NotFound("");
                 }
-
+                Console.WriteLine("filepath------------------"+file.FilePath);
                 await _codeFileService.UpdateCodeFileAsync(file);
 
                 return Ok("File renamed successfully.");
