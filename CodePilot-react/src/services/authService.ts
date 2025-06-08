@@ -1,67 +1,67 @@
-// src/services/authService.ts
-import axios from "axios";
-// import API_BASE_URL from "../config";
+import axios from "axios"
+import type { AuthResponse } from "../types"
 
-export const registerUser = async (username: string, email: string, password: string, role?: string) => {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || import.meta.env.REACT_APP_API_BASE_URL
+
+export const registerUser = async (
+  username: string,
+  email: string,
+  password: string,
+  role = "user",
+): Promise<AuthResponse> => {
   try {
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL||import.meta.env.REACT_APP_API_BASE_URL}/auth/register`, {
+    const response = await axios.post(`${API_BASE_URL}/auth/register`, {
       username,
       email,
       password,
-      role: role ? role : "user" // ���� ���� �������� ����������, ���������� ���������� ������ "user"
-    });
-    console.log(response.data? response.data : "No data in response");
-  
+      role,
+    })
 
-    localStorage.setItem("token", response.data.data);
-
-    return response.data;
+    localStorage.setItem("token", response.data.data)
+    return response.data
   } catch (error) {
-    console.error("Registration failed", error);
-    throw error;
+    console.error("Registration failed:", error)
+    throw error
   }
-};
+}
 
-export const loginUser = async (email: string, password: string) => {
+export const loginUser = async (email: string, password: string): Promise<string> => {
   try {
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL||import.meta.env.REACT_APP_API_BASE_URL}/auth/login`, {
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
       email,
-      password
-    });
-    console.log(response.data);
-   
-    const token = response.data.data;
-    console.log("Extracted token:", token);
-    
+      password,
+    })
+
+    const token = response.data.data
     if (!token) {
-        console.error("Token is undefined or null!");
-    } else {
-      sessionStorage.setItem("token", String(token));
-        console.log("Stored token:", sessionStorage.getItem("token"));
+      throw new Error("No token received from server")
     }
-    
-    return response.data.data; // מחזיר את ה-token כנראה
+
+    sessionStorage.setItem("token", String(token))
+    return token
   } catch (error) {
-    console.error("Login failed", error);
-    throw error;
+    console.error("Login failed:", error)
+    throw error
   }
-};
+}
 
 export const changePassword = async (userId: number, oldPassword: string, newPassword: string, token: string) => {
   try {
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL||import.meta.env.REACT_APP_API_BASE_URL}/auth/change-password`, {
-      userId,
-      oldPassword,
-      newPassword
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    console.log("login success");
-    
-    return response.data;
-  } catch (error) {
-    console.error("Password change failed", error);
-    throw error;
-  }
-};
+    const response = await axios.post(
+      `${API_BASE_URL}/auth/change-password`,
+      {
+        userId,
+        oldPassword,
+        newPassword,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    )
 
+    return response.data
+  } catch (error) {
+    console.error("Password change failed:", error)
+    throw error
+  }
+}
