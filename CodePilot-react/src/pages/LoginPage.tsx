@@ -61,7 +61,7 @@ const LoginPage = ({ onLogin }: LoginPageProps) => {
     }
   }
 
-  const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (field: "email" | "password") => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }))
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: false }))

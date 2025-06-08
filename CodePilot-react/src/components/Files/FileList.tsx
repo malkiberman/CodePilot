@@ -56,7 +56,7 @@ const FileList = ({ files, setFiles, loading = false }: FileListProps) => {
   const theme = useTheme()
 
   const getLanguageColor = (language: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       javascript: "#F7DF1E",
       typescript: "#3178C6",
       python: "#3776AB",
@@ -73,7 +73,7 @@ const FileList = ({ files, setFiles, loading = false }: FileListProps) => {
       kotlin: "#7F52FF",
       swift: "#FA7343",
     }
-    return colors[language.toLowerCase()] || theme.palette.primary.main
+    return colors[language.toLowerCase()] 
   }
 
   const handleFileClick = (fileId: number) => {

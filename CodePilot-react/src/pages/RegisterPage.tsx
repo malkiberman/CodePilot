@@ -21,14 +21,16 @@ import { motion } from "framer-motion"
 import { Link, useNavigate } from "react-router-dom"
 import { registerUser } from "../services/authService"
 
+type FieldName = "username" | "email" | "password" | "confirmPassword";
+
 const RegisterPage = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Record<FieldName, string>>({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
   })
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<Record<FieldName, boolean>>({
     username: false,
     email: false,
     password: false,
@@ -40,7 +42,7 @@ const RegisterPage = () => {
   const navigate = useNavigate()
 
   const validateForm = () => {
-    const newErrors = {
+    const newErrors: Record<FieldName, boolean> = {
       username: !formData.username || formData.username.length < 3,
       email: !formData.email || !/\S+@\S+\.\S+/.test(formData.email),
       password: !formData.password || formData.password.length < 6,
@@ -68,14 +70,20 @@ const RegisterPage = () => {
     }
   }
 
-  const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (field: FieldName) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }))
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: false }))
     }
   }
 
-  const inputFields = [
+  const inputFields: {
+    name: FieldName
+    label: string
+    type: string
+    icon: React.ReactNode
+    helperText: string
+  }[] = [
     {
       name: "username",
       label: "Username",
