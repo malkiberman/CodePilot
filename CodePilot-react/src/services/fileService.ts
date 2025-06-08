@@ -36,9 +36,44 @@ export const getUserFiles = async (): Promise<CodeFile[]> => {
     const response = await axios.get(`${API_BASE_URL}/CodeFile/user`, {
       headers: getAuthHeaders(),
     })
-    return response.data
-  } catch (error) {
+
+    // Handle different response formats gracefully
+    if (!response.data) {
+      return []
+    }
+
+    // If response is not an array, return empty array
+    if (!Array.isArray(response.data)) {
+      console.warn("Server returned non-array response:", response.data)
+      return []
+    }
+
+    // Transform the data to ensure we have the right field names
+    const files = response.data.map((file: any) => ({
+      id: file.id || file.Id,
+      fileName: file.fileName || file.FileName,
+      language: file.language || file.Language || file.fileType || file.FileType || "javascript",
+      filePath: file.filePath || file.FilePath,
+      createdAt: file.createdAt || file.CreatedAt || file.created_at || new Date().toISOString(),
+      updatedAt:
+        file.updatedAt ||
+        file.UpdatedAt ||
+        file.updated_at ||
+        file.createdAt ||
+        file.CreatedAt ||
+        new Date().toISOString(),
+    }))
+
+    return files
+  } catch (error: any) {
     console.error("Failed to fetch user files:", error)
+
+    // For new users or empty responses, don't throw error
+    if (error?.response?.status === 404 || error?.response?.status === 204) {
+      return []
+    }
+
+    // Only throw for actual server errors
     throw error
   }
 }
@@ -87,10 +122,11 @@ export const getFileVersions = async (fileId: number): Promise<FileVersion[]> =>
     const response = await axios.get(`${API_BASE_URL}/CodeFile/${fileId}/versions`, {
       headers: getAuthHeaders(),
     })
-    return response.data
+    return response.data || []
   } catch (error) {
     console.error("Failed to fetch file versions:", error)
-    throw error
+    // Return empty array instead of throwing for versions
+    return []
   }
 }
 
@@ -117,8 +153,6 @@ export const uploadFileVersion = async (fileId: number, file: File, fileName: st
 // Content Fetching
 export const fetchFileContent = async (filePath: string): Promise<string> => {
   try {
-    console.log("Fetching file content from:", filePath);
-    
     const response = await fetch(filePath)
     if (!response.ok) {
       throw new Error("Failed to fetch file content")

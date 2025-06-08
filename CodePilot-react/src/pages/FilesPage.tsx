@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Container, Typography, Box } from "@mui/material"
+import { Container, Typography, Box, useTheme } from "@mui/material"
 import { motion } from "framer-motion"
 import { getUserFiles } from "../services/fileService"
 import FileUpload from "../components/Files/FileUpload"
@@ -14,17 +14,32 @@ const FilesPage = () => {
   const [files, setFiles] = useState<CodeFile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  
+  const [hasInitialLoad, setHasInitialLoad] = useState(false)
+  const theme = useTheme()
 
   const fetchFiles = async () => {
     try {
       setLoading(true)
       setError(null)
       const data = await getUserFiles()
-      setFiles(data)
-    } catch (error) {
+
+      // Handle different response formats
+      const filesArray = Array.isArray(data) ? data : []
+      setFiles(filesArray)
+      setHasInitialLoad(true)
+    } catch (error: any) {
       console.error("Error fetching files:", error)
-      setError("Failed to load files. Please try again.")
+
+      // Don't show error for new users - just set empty array
+      if (error?.response?.status === 404 || error?.response?.status === 204) {
+        // No files found - this is normal for new users
+        setFiles([])
+        setHasInitialLoad(true)
+        setError(null)
+      } else {
+        // Only show error for actual server problems
+        setError("Failed to load files. Please try again.")
+      }
     } finally {
       setLoading(false)
     }
@@ -38,12 +53,9 @@ const FilesPage = () => {
     fetchFiles()
   }
 
-  if (loading) {
+  // Show loading only on initial load
+  if (loading && !hasInitialLoad) {
     return <LoadingSpinner message="Loading your files..." />
-  }
-
-  if (error) {
-    return <ErrorMessage message={error} onRetry={fetchFiles} />
   }
 
   return (
@@ -69,6 +81,7 @@ const FilesPage = () => {
         </Box>
       </motion.div>
 
+      {/* Always show file upload - this is critical for new users! */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -77,13 +90,23 @@ const FilesPage = () => {
         <FileUpload files={files} onFileUploaded={handleFileUploaded} />
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <FileList files={files} setFiles={setFiles} />
-      </motion.div>
+      {/* Show error only if it's a real server error AND we have initial load */}
+      {error && hasInitialLoad && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          <ErrorMessage message={error} onRetry={fetchFiles} />
+        </motion.div>
+      )}
+
+      {/* Show file list - it handles empty state gracefully */}
+      {hasInitialLoad && (
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <FileList files={files} setFiles={setFiles} loading={loading && hasInitialLoad} />
+        </motion.div>
+      )}
     </Container>
   )
 }
