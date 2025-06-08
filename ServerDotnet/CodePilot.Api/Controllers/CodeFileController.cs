@@ -267,6 +267,19 @@ namespace CodePilot.Api.Controllers
 
                 // שינוי שם הקובץ במסד הנתונים
                 file.FileName = renameFileDto.NewFileName;
+
+                // עדכון הנתיב עם שם הקובץ החדש
+                var path = file.FilePath;
+                var lastSlashIndex = path.LastIndexOf('/');
+                if (lastSlashIndex >= 0)
+                {
+                    file.FilePath = path.Substring(0, lastSlashIndex + 1) + renameFileDto.NewFileName;
+                }
+                else
+                {
+                    return NotFound("");
+                }
+
                 await _codeFileService.UpdateCodeFileAsync(file);
 
                 return Ok("File renamed successfully.");
@@ -276,9 +289,9 @@ namespace CodePilot.Api.Controllers
                 return StatusCode(500, "Error renaming file.");
             }
         }
-    }
 
-}
+
+    }
 
 
 
