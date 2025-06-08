@@ -62,7 +62,7 @@ export const useFileData = (fileId: string | undefined) => {
     }
 
     fetchData()
-  }, [])
+  }, [fileId])
 
   return {
     fileData,
