@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Container, Typography, Box, useTheme } from "@mui/material"
+import { Container, Typography, Box } from "@mui/material"
 import { motion } from "framer-motion"
 import { getUserFiles } from "../services/fileService"
 import FileUpload from "../components/Files/FileUpload"
@@ -15,7 +15,7 @@ const FilesPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [hasInitialLoad, setHasInitialLoad] = useState(false)
-  const theme = useTheme()
+
 
   const fetchFiles = async () => {
     try {
