@@ -33,10 +33,11 @@ import {
   Code as CodeIcon,
   Language as LanguageIcon,
   MoreVert as MoreVertIcon,
+  Schedule as ScheduleIcon,
 } from "@mui/icons-material"
 import { motion, AnimatePresence } from "framer-motion"
 import { deleteFile, renameFile } from "../../services/fileService"
-import { getLanguageFromFileName, formatDate } from "../../utils"
+import { getLanguageFromFileName, formatRelativeTime, formatDate } from "../../utils"
 import type { CodeFile } from "../../types"
 import LoadingSpinner from "../UI/LoadingSpinner"
 
@@ -56,7 +57,9 @@ const FileList = ({ files, setFiles, loading = false }: FileListProps) => {
   const theme = useTheme()
 
   const getLanguageColor = (language: string) => {
-    const colors: Record<string, string> = {
+    const colors: { [key in
+      "javascript" | "typescript" | "python" | "java" | "csharp" | "cpp" | "html" | "css" | "json" | "php" | "ruby" | "go" | "rust" | "kotlin" | "swift"
+    ]: string } = {
       javascript: "#F7DF1E",
       typescript: "#3178C6",
       python: "#3776AB",
@@ -73,7 +76,8 @@ const FileList = ({ files, setFiles, loading = false }: FileListProps) => {
       kotlin: "#7F52FF",
       swift: "#FA7343",
     }
-    return colors[language.toLowerCase()] 
+    const key = language.toLowerCase() as keyof typeof colors
+    return colors[key] || theme.palette.primary.main
   }
 
   const handleFileClick = (fileId: number) => {
@@ -195,6 +199,9 @@ const FileList = ({ files, setFiles, loading = false }: FileListProps) => {
               const language = getLanguageFromFileName(file.fileName)
               const languageColor = getLanguageColor(language)
 
+              // Debug: Log the file data to see what we're getting
+              console.log("File data:", file)
+
               return (
                 <motion.div
                   key={file.id}
@@ -258,9 +265,14 @@ const FileList = ({ files, setFiles, loading = false }: FileListProps) => {
                           </Typography>
                         </Box>
 
-                        <Typography variant="caption" color="text.secondary">
-                          {formatDate(file.updatedAt)}
-                        </Typography>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <ScheduleIcon sx={{ fontSize: 16, color: theme.palette.text.secondary, mr: 0.5 }} />
+                          <Tooltip title={formatDate(file.updatedAt || file.createdAt)}>
+                            <Typography variant="caption" color="text.secondary">
+                              {formatRelativeTime(file.updatedAt || file.createdAt)}
+                            </Typography>
+                          </Tooltip>
+                        </Box>
                       </Box>
                     </Box>
 
