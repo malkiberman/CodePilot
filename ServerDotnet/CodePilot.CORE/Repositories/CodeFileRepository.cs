@@ -128,6 +128,8 @@ namespace CodePilot.CORE.Repositories
                 _logger.LogInformation($"Attempting to update CodeFile with ID: {codeFile.Id}");
 
                 entity.FileName = codeFile.FileName;
+                entity.FilePath = codeFile.FilePath;
+
                 await _context.SaveChangesAsync(); // ✔️ רק משנה את האובייקט הקיים
                 // עדכון שם הקובץ בכל הגרסאות גם
                 var fileVersions = await _context.FileVersions

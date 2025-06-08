@@ -147,6 +147,7 @@ namespace CodePilot.Services.Services
             try
             {
                 _logger.LogInformation($"Attempting to update CodeFile with ID {codeFile.Id}");
+                Console.WriteLine("filepath--------------in upsate servise"+ codeFile.FilePath);
                 await _codeFileRepository.UpdateAsync(codeFile);
                 _logger.LogInformation($"Successfully updated CodeFile with ID {codeFile.Id}");
             }
